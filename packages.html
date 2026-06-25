@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paquetes — Audax Project</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --orange: #FF6B29; --orange-mid: #D94F18; --orange-dim: #8A2E08;
+      --black: #0A0A0A; --white: #FFFFFF;
+      --white-80: rgba(255,255,255,0.80); --white-60: rgba(255,255,255,0.60);
+      --white-50: rgba(255,255,255,0.50); --white-20: rgba(255,255,255,0.20);
+      --white-10: rgba(255,255,255,0.10); --white-06: rgba(255,255,255,0.06);
+      --glass-bg: rgba(255,255,255,0.07); --glass-border: rgba(255,255,255,0.14);
+      --glass-blur: blur(24px) saturate(1.4);
+      --radius-sm: 12px; --radius-md: 20px; --radius-lg: 32px; --radius-xl: 48px;
+      --font-display: 'Syne', sans-serif; --font-body: 'Inter', sans-serif;
+      --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--white); font-family: var(--font-body); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+    nav { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; width: calc(100% - 40px); max-width: 1100px; background: rgba(10,10,10,0.75); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px); border: 1px solid var(--glass-border); border-radius: 999px; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-icon { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #FF6B29, #8A2E08); display: flex; align-items: center; justify-content: center; }
+    .nav-logo-icon svg { width: 18px; height: 18px; }
+    .nav-logo-text { font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: -0.02em; color: var(--white); }
+    .nav-logo-text span { color: var(--orange); }
+    .nav-back { font-size: 13px; color: var(--white-50); text-decoration: none; padding: 7px 14px; border-radius: 999px; transition: var(--transition); }
+    .nav-back:hover { background: var(--white-10); color: var(--white); }
+    .nav-cta-sm { padding: 8px 20px; background: var(--orange); color: var(--white); border: none; border-radius: 999px; font-family: var(--font-body); font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; transition: var(--transition); }
+    .nav-cta-sm:hover { background: #FF8C5A; transform: scale(1.02); }
+
+    .page-hero { position: relative; min-height: 44vh; display: flex; align-items: flex-end; padding: 120px 24px 60px; overflow: hidden; }
+    .page-hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 90% 80% at 50% 10%, rgba(255,107,41,0.16) 0%, transparent 55%), var(--black); }
+    .page-hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 60px 60px; }
+    .page-hero-content { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; width: 100%; }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--white-50); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--white-50); text-decoration: none; }
+    .page-category { font-size: 12px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--orange); margin-bottom: 16px; }
+    .page-title { font-family: var(--font-display); font-size: clamp(40px, 7vw, 80px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.0; margin-bottom: 20px; }
+    .page-sub { font-size: 17px; color: var(--white-50); max-width: 540px; line-height: 1.6; }
+
+    /* PACKAGES SECTION */
+    .packages-section { max-width: 1100px; margin: 0 auto; padding: 64px 24px 40px; }
+
+    .section-label { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--white-50); margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--glass-border); }
+
+    .currency-bar { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-bottom: 32px; }
+    .curr-label { font-size: 13px; color: var(--white-50); }
+    .curr-toggle { display: flex; gap: 4px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 999px; padding: 4px; }
+    .curr-btn { padding: 5px 14px; border: none; border-radius: 999px; font-size: 12px; font-weight: 600; font-family: var(--font-body); cursor: pointer; transition: var(--transition); background: transparent; color: var(--white-50); }
+    .curr-btn.active { background: var(--white-10); color: var(--white); }
+
+    /* One-time packages grid */
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 60px;
+    }
+
+    .plan-card {
+      position: relative;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 36px 28px;
+      backdrop-filter: var(--glass-blur);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+    }
+    .plan-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+    .plan-card.featured {
+      border: 1.5px solid rgba(255,107,41,0.5);
+      background: linear-gradient(160deg, rgba(255,107,41,0.08) 0%, var(--glass-bg) 50%);
+    }
+    .plan-card.featured:hover { box-shadow: 0 20px 60px rgba(255,107,41,0.15); }
+
+    .plan-badge {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+      padding: 4px 14px;
+      background: linear-gradient(135deg, var(--orange), var(--orange-dim));
+      color: var(--white); border-radius: 999px; white-space: nowrap;
+    }
+
+    .plan-name { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 20px; }
+    .plan-price-row { display: flex; align-items: flex-end; gap: 6px; margin-bottom: 6px; }
+    .plan-price { font-family: var(--font-display); font-size: 36px; font-weight: 800; line-height: 1; color: var(--white); }
+    .plan-curr { font-size: 14px; color: var(--white-50); margin-bottom: 4px; }
+    .plan-period { font-size: 12px; color: var(--white-50); margin-bottom: 28px; }
+
+    .plan-divider { height: 1px; background: var(--glass-border); margin-bottom: 20px; }
+
+    .plan-items { list-style: none; flex: 1; }
+    .plan-items li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13px; color: var(--white-80); padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04); line-height: 1.4;
+    }
+    .plan-items li:last-child { border-bottom: none; }
+    .plan-items li::before { content: '✓'; color: var(--orange); font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    .plan-cta {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 28px;
+      padding: 13px 24px;
+      border-radius: 999px;
+      font-family: var(--font-body); font-size: 14px; font-weight: 600;
+      text-decoration: none; cursor: pointer; transition: var(--transition);
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg); color: var(--white-80);
+    }
+    .plan-cta:hover { background: var(--white-10); color: var(--white); transform: scale(1.02); }
+    .plan-cta:active { transform: scale(0.97); }
+    .plan-cta.featured-cta { background: var(--orange); border-color: var(--orange); color: var(--white); box-shadow: 0 4px 24px rgba(255,107,41,0.3); }
+    .plan-cta.featured-cta:hover { background: #FF8C5A; box-shadow: 0 4px 32px rgba(255,107,41,0.45); }
+
+    /* Monthly plans */
+    .monthly-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 60px;
+    }
+
+    /* Strategy box */
+    .strategy-box {
+      padding: 32px 36px;
+      background: linear-gradient(135deg, rgba(255,107,41,0.09), rgba(255,107,41,0.03));
+      border: 1px solid rgba(255,107,41,0.22);
+      border-radius: var(--radius-lg);
+      margin-bottom: 40px;
+    }
+    .strategy-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange); margin-bottom: 12px; }
+    .strategy-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 12px; }
+    .strategy-desc { font-size: 14px; color: var(--white-50); line-height: 1.7; }
+    .strategy-desc strong { color: var(--white); }
+
+    footer { border-top: 1px solid var(--glass-border); padding: 40px 24px; max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .footer-logo { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--white); }
+    .footer-logo span { color: var(--orange); }
+    .footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
+
+    [data-lang] { display: none; }
+    [data-lang].v { display: initial; }
+    div[data-lang].v, p[data-lang].v { display: block; }
+    span[data-lang].v { display: inline; }
+
+    @media (max-width: 900px) { .plans-grid { grid-template-columns: 1fr; } .monthly-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 20L12 4L20 20" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M7 14H17" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="nav-logo-text">Audax <span>Project</span></span>
+  </a>
+  <a href="index.html" class="nav-back">← <span data-lang="es" class="v">Inicio</span><span data-lang="en">Home</span></a>
+  <a href="https://wa.me/529999999999?text=Hola%2C%20quiero%20cotizar%20un%20paquete%20con%20Audax%20Project" target="_blank" class="nav-cta-sm">
+    <span data-lang="es" class="v">Cotizar ↗</span><span data-lang="en">Get a Quote ↗</span>
+  </a>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-grid"></div>
+  <div class="page-hero-content">
+    <div class="breadcrumb">
+      <a href="index.html">Audax Project</a>
+      <span>/</span>
+      <span data-lang="es" class="v">Paquetes</span>
+      <span data-lang="en">Packages</span>
+    </div>
+    <div class="page-category">📦 <span data-lang="es" class="v">Paquetes</span><span data-lang="en">Packages</span></div>
+    <h1 class="page-title">
+      <span data-lang="es" class="v">Todo en uno,<br>mejor precio.</span>
+      <span data-lang="en">All in one,<br>better price.</span>
+    </h1>
+    <p class="page-sub">
+      <span data-lang="es" class="v">Diseñados para negocios gastronómicos en Yucatán. Combina diseño, web y contenido a un precio que tiene sentido.</span>
+      <span data-lang="en">Designed for food & hospitality businesses in Yucatán. Combine design, web and content at a price that makes sense.</span>
+    </p>
+  </div>
+</div>
+
+<section class="packages-section">
+
+  <div class="currency-bar">
+    <span class="curr-label"><span data-lang="es" class="v">Ver precios en:</span><span data-lang="en">See prices in:</span></span>
+    <div class="curr-toggle">
+      <button class="curr-btn active" id="c-mxn" onclick="setCurr('mxn')">MXN</button>
+      <button class="curr-btn" id="c-usd" onclick="setCurr('usd')">USD</button>
+    </div>
+  </div>
+
+  <!-- ONE-TIME PACKAGES -->
+  <div class="section-label"><span data-lang="es" class="v">Paquetes únicos</span><span data-lang="en">One-time packages</span></div>
+
+  <div class="plans-grid">
+    <!-- Starter -->
+    <div class="plan-card">
+      <div class="plan-name">Starter</div>
+      <div class="plan-price-row">
+        <div class="plan-price" id="p-starter">$8,500</div>
+        <div class="plan-curr">MXN</div>
+      </div>
+      <div class="plan-period" id="ps-starter"><span data-lang="es" class="v">pago único</span><span data-lang="en">one-time payment</span></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-items">
+        <li><span data-lang="es" class="v">Logo completo + manual básico</span><span data-lang="en">Full logo + basic guide</span></li>
+        <li><span data-lang="es" class="v">Tarjeta de presentación</span><span data-lang="en">Business card</span></li>
+        <li><span data-lang="es" class="v">1 flyer de evento</span><span data-lang="en">1 event flyer</span></li>
+        <li><span data-lang="es" class="v">Entrega en 10–14 días</span><span data-lang="en">Delivered in 10–14 days</span></li>
+      </ul>
+      <a href="https://wa.me/529999999999?text=Hola%2C%20quiero%20el%20paquete%20Starter%20de%20Audax%20Project" target="_blank" class="plan-cta">
+        <span data-lang="es" class="v">Empezar con Starter →</span>
+        <span data-lang="en">Start with Starter →</span>
+      </a>
+    </div>
+
+    <!-- Identidad + Presencia (FEATURED) -->
+    <div class="plan-card featured">
+      <div class="plan-badge">⭐ <span data-lang="es" class="v">Más vendido</span><span data-lang="en">Best seller</span></div>
+      <div class="plan-name">
+        <span data-lang="es" class="v">Identidad + Presencia</span>
+        <span data-lang="en">Identity + Presence</span>
+      </div>
+      <div class="plan-price-row">
+        <div class="plan-price" id="p-medio">$22,000</div>
+        <div class="plan-curr">MXN</div>
+      </div>
+      <div class="plan-period" id="ps-medio"><span data-lang="es" class="v">pago único</span><span data-lang="en">one-time payment</span></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-items">
+        <li><span data-lang="es" class="v">Logo completo</span><span data-lang="en">Full logo</span></li>
+        <li><span data-lang="es" class="v">Diseño de menú (hasta 4 pág)</span><span data-lang="en">Menu design (up to 4 pages)</span></li>
+        <li><span data-lang="es" class="v">Tarjetas de presentación + 2 flyers</span><span data-lang="en">Business cards + 2 flyers</span></li>
+        <li><span data-lang="es" class="v">Sesión de fotos (3 horas)</span><span data-lang="en">Photo session (3 hours)</span></li>
+        <li><span data-lang="es" class="v">Landing page sencilla</span><span data-lang="en">Simple landing page</span></li>
+      </ul>
+      <a href="https://wa.me/529999999999?text=Hola%2C%20quiero%20el%20paquete%20Identidad%20%2B%20Presencia%20de%20Audax%20Project" target="_blank" class="plan-cta featured-cta">
+        <span data-lang="es" class="v">Quiero este paquete →</span>
+        <span data-lang="en">I want this package →</span>
+      </a>
+    </div>
+
+    <!-- Presencia Digital -->
+    <div class="plan-card">
+      <div class="plan-name">
+        <span data-lang="es" class="v">Presencia Digital</span>
+        <span data-lang="en">Digital Presence</span>
+      </div>
+      <div class="plan-price-row">
+        <div class="plan-price" id="p-full">$38,000</div>
+        <div class="plan-curr">MXN</div>
+      </div>
+      <div class="plan-period" id="ps-full"><span data-lang="es" class="v">pago único</span><span data-lang="en">one-time payment</span></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-items">
+        <li><span data-lang="es" class="v">Todo lo del paquete anterior</span><span data-lang="en">Everything in previous package</span></li>
+        <li><span data-lang="es" class="v">Sitio web completo (hasta 5 páginas)</span><span data-lang="en">Full website (up to 5 pages)</span></li>
+        <li><span data-lang="es" class="v">Sesión de fotos media jornada</span><span data-lang="en">Half-day photo session</span></li>
+        <li><span data-lang="es" class="v">3 reels de arranque</span><span data-lang="en">3 launch reels</span></li>
+        <li><span data-lang="es" class="v">1 mes de soporte incluido</span><span data-lang="en">1 month support included</span></li>
+      </ul>
+      <a href="https://wa.me/529999999999?text=Hola%2C%20quiero%20el%20paquete%20Presencia%20Digital%20de%20Audax%20Project" target="_blank" class="plan-cta">
+        <span data-lang="es" class="v">Quiero este paquete →</span>
+        <span data-lang="en">I want this package →</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- MONTHLY -->
+  <div class="section-label">
+    <span data-lang="es" class="v">Plan mensual — Contenido &amp; Redes</span>
+    <span data-lang="en">Monthly plan — Content &amp; Social</span>
+  </div>
+
+  <div class="monthly-grid">
+    <!-- Básico -->
+    <div class="plan-card">
+      <div class="plan-name">
+        <span data-lang="es" class="v">Contenido Básico</span>
+        <span data-lang="en">Basic Content</span>
+      </div>
+      <div class="plan-price-row">
+        <div class="plan-price" id="p-redes-b">$4,500</div>
+        <div class="plan-curr">MXN</div>
+      </div>
+      <div class="plan-period" id="ps-redes-b"><span data-lang="es" class="v">por mes</span><span data-lang="en">per month</span></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-items">
+        <li><span data-lang="es" class="v">1 sesión mensual (2 horas)</span><span data-lang="en">1 monthly session (2 hours)</span></li>
+        <li><span data-lang="es" class="v">15 fotos editadas</span><span data-lang="en">15 edited photos</span></li>
+        <li><span data-lang="es" class="v">3 reels para Instagram/TikTok</span><span data-lang="en">3 reels for Instagram/TikTok</span></li>
+      </ul>
+      <a href="https://wa.me/529999999999?text=Hola%2C%20quiero%20el%20plan%20Contenido%20B%C3%A1sico%20mensual%20de%20Audax%20Project" target="_blank" class="plan-cta">
+        <span data-lang="es" class="v">Contratar →</span><span data-lang="en">Get started →</span>
+      </a>
+    </div>
+
+    <!-- Completo -->
+    <div class="plan-card featured">
+      <div class="plan-badge">⭐ <span data-lang="es" class="v">Recomendado</span><span data-lang="en">Recommended</span></div>
+      <div class="plan-name">
+        <span data-lang="es" class="v">Contenido Completo</span>
+        <span data-lang="en">Full Content</span>
+      </div>
+      <div class="plan-price-row">
+        <div class="plan-price" id="p-redes-p">$8,500</div>
+        <div class="plan-curr">MXN</div>
+      </div>
+      <div class="plan-period" id="ps-redes-p"><span data-lang="es" class="v">por mes</span><span data-lang="en">per month</span></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-items">
+        <li><span data-lang="es" class="v">2 sesiones mensuales</span><span data-lang="en">2 monthly sessions</span></li>
+        <li><span data-lang="es" class="v">30 fotos editadas</span><span data-lang="en">30 edited photos</span></li>
+        <li><span data-lang="es" class="v">6 reels para Instagram/TikTok</span><span data-lang="en">6 reels for Instagram/TikTok</span></li>
+        <li><span data-lang="es" class="v">Stories + posts para feed</span><span data-lang="en">Stories + feed posts</span></li>
+      </ul>
+      <a href="https://wa.me/529999999999?text=Hola%2C%20quiero%20el%20plan%20Contenido%20Completo%20mensual%20de%20Audax%20Project" target="_blank" class="plan-cta featured-cta">
+        <span data-lang="es" class="v">Contratar →</span><span data-lang="en">Get started →</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Strategy note -->
+  <div class="strategy-box">
+    <div class="strategy-eyebrow">💡 <span data-lang="es" class="v">Estrategia de entrada</span><span data-lang="en">Entry strategy</span></div>
+    <div class="strategy-title">
+      <span data-lang="es" class="v">¿Primer cliente en una ciudad nueva?</span>
+      <span data-lang="en">First client in a new city?</span>
+    </div>
+    <p class="strategy-desc">
+      <span data-lang="es" class="v">Ofrece el paquete <strong>Starter al 50%</strong> al primer cliente de cada ciudad como "caso de estudio". Ellos te dan permiso de publicar el trabajo y tú ganas portafolio real con resultados reales. <strong>Win-win.</strong></span>
+      <span data-lang="en">Offer the <strong>Starter package at 50%</strong> to the first client in each city as a "case study". They give you permission to publish the work and you gain a real portfolio with real results. <strong>Win-win.</strong></span>
+    </p>
+  </div>
+
+</section>
+
+<footer>
+  <div class="footer-logo">Audax <span>Project</span></div>
+  <p class="footer-copy">© 2025 Audax Project · Mérida, Yucatán</p>
+</footer>
+
+<script>
+  document.querySelectorAll('[data-lang="es"]').forEach(el => el.classList.add('v'));
+
+  const planPrices = {
+    'p-starter':  { mxn: '$8,500',  usd: '$494' },
+    'p-medio':    { mxn: '$22,000', usd: '$1,279' },
+    'p-full':     { mxn: '$38,000', usd: '$2,209' },
+    'p-redes-b':  { mxn: '$4,500',  usd: '$262' },
+    'p-redes-p':  { mxn: '$8,500',  usd: '$494' },
+  };
+
+  function setCurr(c) {
+    document.getElementById('c-mxn').classList.toggle('active', c === 'mxn');
+    document.getElementById('c-usd').classList.toggle('active', c === 'usd');
+    Object.entries(planPrices).forEach(([id, p]) => {
+      if(document.getElementById(id)) document.getElementById(id).textContent = p[c];
+    });
+    // Update curr labels
+    document.querySelectorAll('.plan-curr').forEach(el => el.textContent = c.toUpperCase());
+  }
+</script>
+</body>
+</html>

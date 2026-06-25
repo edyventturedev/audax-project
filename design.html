@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graphics & Design — Audax Project</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* Shared CSS from main site */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --orange:    #FF6B29;
+      --orange-mid:#D94F18;
+      --orange-dim:#8A2E08;
+      --black:     #0A0A0A;
+      --black-2:   #111111;
+      --black-3:   #1A1A1A;
+      --black-4:   #242424;
+      --grey-1:    #2E2E2E;
+      --white:     #FFFFFF;
+      --white-80:  rgba(255,255,255,0.80);
+      --white-50:  rgba(255,255,255,0.50);
+      --white-20:  rgba(255,255,255,0.20);
+      --white-10:  rgba(255,255,255,0.10);
+      --white-06:  rgba(255,255,255,0.06);
+      --glass-bg:  rgba(255,255,255,0.07);
+      --glass-border: rgba(255,255,255,0.14);
+      --glass-blur: blur(24px) saturate(1.4);
+      --radius-sm: 12px;
+      --radius-md: 20px;
+      --radius-lg: 32px;
+      --radius-xl: 48px;
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--white); font-family: var(--font-body); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+    nav {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      z-index: 1000; width: calc(100% - 40px); max-width: 1100px;
+      background: rgba(10,10,10,0.75); backdrop-filter: blur(32px) saturate(1.5);
+      -webkit-backdrop-filter: blur(32px) saturate(1.5);
+      border: 1px solid var(--glass-border); border-radius: 999px;
+      padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-icon { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #FF6B29, #8A2E08); display: flex; align-items: center; justify-content: center; }
+    .nav-logo-icon svg { width: 18px; height: 18px; }
+    .nav-logo-text { font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: -0.02em; color: var(--white); }
+    .nav-logo-text span { color: var(--orange); }
+    .nav-back { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--white-50); text-decoration: none; padding: 7px 14px; border-radius: 999px; transition: var(--transition); }
+    .nav-back:hover { background: var(--white-10); color: var(--white); }
+    .nav-cta-sm { padding: 8px 20px; background: var(--orange); color: var(--white); border: none; border-radius: 999px; font-family: var(--font-body); font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; transition: var(--transition); }
+    .nav-cta-sm:hover { background: #FF8C5A; transform: scale(1.02); }
+
+    /* Page hero */
+    .page-hero {
+      position: relative; min-height: 50vh; display: flex; align-items: flex-end;
+      padding: 120px 24px 64px; overflow: hidden;
+    }
+    .page-hero-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 10% 50%, rgba(255,107,41,0.18) 0%, transparent 60%),
+                  var(--black);
+    }
+    .page-hero-grid {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .page-hero-content { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; width: 100%; }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--white-50); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--white-50); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--white); }
+    .breadcrumb-sep { opacity: 0.3; }
+    .page-category { font-size: 12px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--orange); margin-bottom: 16px; }
+    .page-title { font-family: var(--font-display); font-size: clamp(40px, 7vw, 80px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.0; margin-bottom: 20px; }
+    .page-sub { font-size: 17px; color: var(--white-50); max-width: 540px; line-height: 1.6; }
+
+    /* Services list */
+    .services-section { max-width: 1100px; margin: 0 auto; padding: 64px 24px 120px; }
+
+    .currency-bar {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      margin-bottom: 40px;
+    }
+    .curr-label { font-size: 13px; color: var(--white-50); }
+    .curr-toggle { display: flex; gap: 4px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 999px; padding: 4px; }
+    .curr-btn { padding: 5px 14px; border: none; border-radius: 999px; font-size: 12px; font-weight: 600; font-family: var(--font-body); cursor: pointer; transition: var(--transition); background: transparent; color: var(--white-50); }
+    .curr-btn.active { background: var(--white-10); color: var(--white); }
+
+    .service-item {
+      display: grid; grid-template-columns: 1fr auto;
+      align-items: start; gap: 16px;
+      padding: 28px 32px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      backdrop-filter: var(--glass-blur);
+      margin-bottom: 12px;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .service-item::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      background: linear-gradient(180deg, var(--orange), var(--orange-dim));
+      border-radius: 0 2px 2px 0;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .service-item:hover { border-color: rgba(255,107,41,0.25); transform: translateX(4px); box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
+    .service-item:hover::before { opacity: 1; }
+
+    .si-icon { font-size: 28px; margin-bottom: 14px; }
+    .si-name { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+    .si-note { font-size: 13px; color: var(--white-50); line-height: 1.5; }
+    .si-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; margin-top: 10px; }
+    .tag-hot { background: rgba(255,107,41,0.15); color: var(--orange); border: 1px solid rgba(255,107,41,0.3); }
+    .tag-new { background: rgba(16,185,129,0.1); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
+
+    .si-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+    .si-price { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--white); white-space: nowrap; }
+    .si-unit { font-size: 11px; color: var(--white-50); font-weight: 400; }
+    .si-cta {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; background: var(--glass-bg); border: 1px solid var(--glass-border);
+      border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--white-80);
+      text-decoration: none; transition: var(--transition); cursor: pointer; white-space: nowrap;
+    }
+    .si-cta:hover { background: var(--orange); border-color: var(--orange); color: var(--white); transform: scale(1.04); }
+    .si-cta:active { transform: scale(0.97); }
+
+    /* Note box */
+    .note-box {
+      margin-top: 40px; padding: 24px 28px;
+      background: linear-gradient(135deg, rgba(255,107,41,0.08), rgba(255,107,41,0.03));
+      border: 1px solid rgba(255,107,41,0.2); border-radius: var(--radius-md);
+      font-size: 14px; color: var(--white-50); line-height: 1.7;
+    }
+    .note-box strong { color: var(--white); }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--glass-border); padding: 40px 24px; max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .footer-logo { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--white); }
+    .footer-logo span { color: var(--orange); }
+    .footer-copy { font-size: 12px; color: var(--white-30); }
+
+    [data-lang] { display: none; }
+    [data-lang].v { display: initial; }
+    div[data-lang].v, p[data-lang].v { display: block; }
+
+    @media (max-width: 640px) {
+      .service-item { grid-template-columns: 1fr; }
+      .si-right { align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 20L12 4L20 20" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M7 14H17" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="nav-logo-text">Audax <span>Project</span></span>
+  </a>
+  <a href="index.html" class="nav-back">← <span data-lang="es" class="v">Inicio</span><span data-lang="en">Home</span></a>
+  <a href="https://wa.me/529999999999?text=Hola%2C%20quiero%20cotizar%20un%20proyecto%20de%20dise%C3%B1o%20con%20Audax%20Project" target="_blank" class="nav-cta-sm">
+    <span data-lang="es" class="v">Cotizar ↗</span>
+    <span data-lang="en">Get a Quote ↗</span>
+  </a>
+</nav>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-grid"></div>
+  <div class="page-hero-content">
+    <div class="breadcrumb">
+      <a href="index.html">Audax Project</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>Graphics &amp; Design</span>
+    </div>
+    <div class="page-category">🎨 Graphics &amp; Design</div>
+    <h1 class="page-title">
+      <span data-lang="es" class="v">Identidad visual<br>que vende.</span>
+      <span data-lang="en">Visual identity<br>that sells.</span>
+    </h1>
+    <p class="page-sub">
+      <span data-lang="es" class="v">Diseño que comunica calidad desde el primer vistazo. Logos, menús, packaging y piezas que hacen que tu negocio se vea diferente.</span>
+      <span data-lang="en">Design that communicates quality at first glance. Logos, menus, packaging and pieces that make your business look different.</span>
+    </p>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="services-section">
+  <div class="currency-bar">
+    <span class="curr-label" data-lang="es" style="display:block;">Todos los precios en:</span>
+    <span class="curr-label" data-lang="en">All prices in:</span>
+    <div class="curr-toggle">
+      <button class="curr-btn active" id="c-mxn" onclick="setCurr('mxn')">MXN</button>
+      <button class="curr-btn" id="c-usd" onclick="setCurr('usd')">USD</button>
+    </div>
+  </div>
+
+  <!-- Logo Design -->
+  <div class="service-item">
+    <div>
+      <div class="si-icon">✦</div>
+      <div class="si-name">Logo Design</div>
+      <p class="si-note">
+        <span data-lang="es" class="v">3 propuestas iniciales, 2 rondas de revisión. Entrega en vectoriales (AI, SVG, PDF), PNG con fondo transparente y manual de uso básico.</span>
+        <span data-lang="en">3 initial proposals, 2 revision rounds. Delivery in vectors (AI, SVG, PDF), PNG with transparent background and basic usage guide.</span>
+      </p>
+      <span class="si-tag tag-hot">⚡ <span data-lang="es" class="v">Más solicitado</span><span data-lang="en">Most requested</span></span>
+    </div>
+    <div class="si-right">
+      <div>
+        <div class="si-price" id="logo-price">$5,500 – $12,000</div>
+        <div class="si-unit" id="logo-unit">MXN · por proyecto</div>
+      </div>
+      <a href="https://wa.me/529999999999?text=Hola%2C%20quiero%20cotizar%20un%20Logo%20Design%20con%20Audax%20Project" target="_blank" class="si-cta">
+        <span data-lang="es" class="v">Cotizar →</span>
+        <span data-lang="en">Quote →</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Business Cards -->
+  <div class="service-item">
+    <div>
+      <div class="si-icon">🃏</div>
+      <div class="si-name">Business Cards</div>
+      <p class="si-note">
+        <span data-lang="es" class="v">Diseño de tarjeta de presentación, 1 o 2 caras. Archivo listo para imprenta en alta resolución (300 dpi), con sangría y marcas de corte.</span>
+        <span data-lang="en">Business card design, 1 or 2 sides. Print-ready file in high resolution (300 dpi), with bleed and crop marks.</span>
+      </p>
+    </div>
+    <div class="si-right">
+      <div>
+        <div class="si-price" id="cards-price">$1,200 – $2,500</div>
+        <div class="si-unit" id="cards-unit">MXN · por proyecto</div>
+      </div>
+      <a href="https://wa.me/529999999999?text=Hola%2C%20quiero%20cotizar%20Business%20Cards%20con%20Audax%20Project" target="_blank" class="si-cta">
+        <span data-lang="es" class="v">Cotizar →</span>
+        <span data-lang="en">Quote →</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Flyers -->
+  <div class="service-item">
+    <div>
+      <div class="si-icon">📄</div>
+      <div class="si-name">Flyers</div>
+      <p class="si-note">
+        <span data-lang="es" class="v">Diseño de flyer para impresión y/o formato digital (redes sociales). 1 revisión incluida. Adaptado a la identidad visual de tu negocio.</span>
+        <span data-lang="en">Flyer design for print and/or digital format (social media). 1 revision included. Adapted to your business visual identity.</span>
+      </p>
+    </div>
+    <div class="si-right">
+      <div>
+        <div class="si-price" id="flyer-price">$900 – $2,000</div>
+        <div class="si-unit" id="flyer-unit">MXN · por pieza</div>
+      </div>
+      <a href="https://wa.me/529999999999?text=Hola%2C%20quiero%20cotizar%20Flyers%20con%20Audax%20Project" target="_blank" class="si-cta">
+        <span data-lang="es" class="v">Cotizar →</span>
+        <span data-lang="en">Quote →</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Menu Design -->
+  <div class="service-item">
+    <div>
+      <div class="si-icon">📋</div>
+      <div class="si-name">
+        <span data-lang="es" class="v">Diseño de Menú</span>
+        <span data-lang="en">Menu Design</span>
+      </div>
+      <p class="si-note">
+        <span data-lang="es" class="v">Hasta 4 páginas, completamente adaptado a la identidad visual del restaurante o bar. Incluye tipografía, jerarquía de secciones y versión digital (PDF interactivo).</span>
+        <span data-lang="en">Up to 4 pages, fully adapted to the restaurant or bar visual identity. Includes typography, section hierarchy, and digital version (interactive PDF).</span>
+      </p>
+      <span class="si-tag tag-hot">⚡ <span data-lang="es" class="v">Tu especialidad</span><span data-lang="en">Your specialty</span></span>
+    </div>
+    <div class="si-right">
+      <div>
+        <div class="si-price" id="menu-price">$3,500 – $8,000</div>
+        <div class="si-unit" id="menu-unit">MXN · por proyecto</div>
+      </div>
+      <a href="https://wa.me/529999999999?text=Hola%2C%20quiero%20cotizar%20un%20Dise%C3%B1o%20de%20Men%C3%BA%20con%20Audax%20Project" target="_blank" class="si-cta">
+        <span data-lang="es" class="v">Cotizar →</span>
+        <span data-lang="en">Quote →</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Packaging -->
+  <div class="service-item">
+    <div>
+      <div class="si-icon">📦</div>
+      <div class="si-name">Packaging &amp; Labels</div>
+      <p class="si-note">
+        <span data-lang="es" class="v">Diseño de etiqueta o empaque listo para producción. Dieline incluido. Aplica para botellas, cajas, bolsas y cualquier contenedor de producto.</span>
+        <span data-lang="en">Label or packaging design ready for production. Dieline included. Applies to bottles, boxes, bags, and any product container.</span>
+      </p>
+    </div>
+    <div class="si-right">
+      <div>
+        <div class="si-price" id="pack-price">$4,000 – $9,000</div>
+        <div class="si-unit" id="pack-unit">MXN · por proyecto</div>
+      </div>
+      <a href="https://wa.me/529999999999?text=Hola%2C%20quiero%20cotizar%20Packaging%20y%20Etiquetas%20con%20Audax%20Project" target="_blank" class="si-cta">
+        <span data-lang="es" class="v">Cotizar →</span>
+        <span data-lang="en">Quote →</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="note-box">
+    <strong><span data-lang="es" class="v">Nota de mercado:</span><span data-lang="en">Market note:</span></strong>
+    <span data-lang="es" class="v"> Logos en México van de $4,000 a $28,000 MXN según complejidad y agencia. El rango de Audax Project está calibrado para medianas empresas en Yucatán — por debajo de agencias de CDMX, por encima de plataformas como Fiverr. Calidad real, precio justo.</span>
+    <span data-lang="en"> Logos in Mexico range from $4,000 to $28,000 MXN depending on complexity and agency. Audax Project's range is calibrated for mid-size businesses in Yucatán — below Mexico City agencies, above platforms like Fiverr. Real quality, fair price.</span>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Audax <span>Project</span></div>
+  <p class="footer-copy">© 2025 Audax Project · Mérida, Yucatán</p>
+</footer>
+
+<script>
+  // Lang init
+  document.querySelectorAll('[data-lang="es"]').forEach(el => el.classList.add('v'));
+
+  const prices = {
+    'logo-price':  { mxn: '$5,500 – $12,000', usd: '$320 – $700' },
+    'cards-price': { mxn: '$1,200 – $2,500',  usd: '$70 – $145' },
+    'flyer-price': { mxn: '$900 – $2,000',    usd: '$52 – $116' },
+    'menu-price':  { mxn: '$3,500 – $8,000',  usd: '$204 – $465' },
+    'pack-price':  { mxn: '$4,000 – $9,000',  usd: '$233 – $523' },
+  };
+  const units = {
+    'logo-unit':  { mxn: 'MXN · por proyecto',  usd: 'USD · per project' },
+    'cards-unit': { mxn: 'MXN · por proyecto',  usd: 'USD · per project' },
+    'flyer-unit': { mxn: 'MXN · por pieza',     usd: 'USD · per piece' },
+    'menu-unit':  { mxn: 'MXN · por proyecto',  usd: 'USD · per project' },
+    'pack-unit':  { mxn: 'MXN · por proyecto',  usd: 'USD · per project' },
+  };
+  function setCurr(c) {
+    document.getElementById('c-mxn').classList.toggle('active', c === 'mxn');
+    document.getElementById('c-usd').classList.toggle('active', c === 'usd');
+    Object.entries(prices).forEach(([id, p]) => { document.getElementById(id).textContent = p[c]; });
+    Object.entries(units).forEach(([id, u]) => { document.getElementById(id).textContent = u[c]; });
+  }
+</script>
+</body>
+</html>
