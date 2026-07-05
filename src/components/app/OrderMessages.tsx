@@ -51,7 +51,8 @@ export function OrderMessages({
           table: "order_messages",
           filter: `order_id=eq.${orderId}`,
         },
-        (payload) => setMessages((prev) => [...prev, payload.new as Message]),
+        // Refetch on any new message so the payload shape never matters.
+        () => load(),
       )
       .subscribe();
 
