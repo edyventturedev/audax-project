@@ -12,11 +12,11 @@ import {
   FileText,
 } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageProvider";
-import { getService, getCategory, formatMXN } from "@/data/services";
-import { Button } from "@/components/ui/Button";
+import { getService, getCategory } from "@/data/services";
+import { RequestPanel } from "@/components/service/RequestPanel";
 
 export default function ServiceDetailPage() {
-  const { lang, t } = useLanguage();
+  const { lang } = useLanguage();
   const params = useParams<{ slug: string }>();
   const service = getService(params.slug);
 
@@ -120,53 +120,7 @@ export default function ServiceDetailPage() {
 
           {/* Pricing card (sticky) */}
           <div className="lg:sticky lg:top-28 lg:self-start">
-            <div className="rounded-3xl border border-line bg-ink-3 p-6">
-              <span className="text-xs uppercase tracking-wide text-fg-faint">
-                {isFixed
-                  ? lang === "es"
-                    ? "Precio"
-                    : "Price"
-                  : t.services.from}
-              </span>
-              <div className="mt-1 flex items-baseline gap-1">
-                <span className="font-[family-name:var(--font-display)] text-4xl font-extrabold tabular-nums">
-                  {formatMXN(service.priceMin)}
-                </span>
-                {service.unit && (
-                  <span className="text-sm text-fg-dim">
-                    {service.unit[lang]}
-                  </span>
-                )}
-              </div>
-              {!isFixed && (
-                <p className="mt-1 text-sm text-fg-dim">
-                  {lang === "es" ? "hasta" : "up to"}{" "}
-                  {formatMXN(service.priceMax)}
-                </p>
-              )}
-
-              <div className="mt-6">
-                {/* Fase 3 wires real checkout / quote request; requires account (Fase 2). */}
-                <Button
-                  href={`/login?next=/servicios/detalle/${service.slug}`}
-                  size="lg"
-                  className="w-full"
-                >
-                  {isFixed
-                    ? lang === "es"
-                      ? "Solicitar y pagar"
-                      : "Request & pay"
-                    : lang === "es"
-                      ? "Solicitar cotización"
-                      : "Request a quote"}
-                </Button>
-                <p className="mt-3 text-center text-xs text-fg-faint">
-                  {lang === "es"
-                    ? "Crea tu cuenta para continuar."
-                    : "Create your account to continue."}
-                </p>
-              </div>
-            </div>
+            <RequestPanel service={service} />
           </div>
         </div>
       </div>
