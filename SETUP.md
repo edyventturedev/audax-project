@@ -15,9 +15,12 @@ Todo empieza en **modo de prueba**: nada cobra dinero real hasta que lo actives.
    - `service_role` key → `SUPABASE_SERVICE_ROLE_KEY` (¡secreta, solo servidor!)
 3. Pega esos 3 valores en el archivo **`.env.local`** del proyecto.
 4. Ve a **SQL Editor** → pega y ejecuta, en orden:
-   - `supabase/migrations/0001_init.sql`
-   - `supabase/migrations/0002_seed_services.sql`
+   - `supabase/migrations/0001_init.sql` — tablas + RLS + trigger de perfil
+   - `supabase/migrations/0002_seed_services.sql` — catálogo de servicios
+   - `supabase/migrations/0003_realtime.sql` — progreso en vivo (realtime)
+   - `supabase/migrations/0004_storage.sql` — políticas de entregables
 5. **Storage** → crea un bucket **privado** llamado `deliverables` (para los archivos finales).
+   Hazlo **antes** de correr `0004_storage.sql` para que las políticas apliquen.
 
 ### Hacerte administrador
 Después de crear tu cuenta (paso 3 de la sección Google, o con email), corre en el SQL Editor:
