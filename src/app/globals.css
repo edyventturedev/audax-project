@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+/*
+  Audax v4 — Design tokens
+  Brand: orange #FF6B29 on near-black, glassmorphism, Syne (display) + Inter (body).
+  Ported from the legacy static site and systematized for Tailwind v4.
+*/
+
+@theme {
+  /* Brand */
+  --color-orange: #ff6b29;
+  --color-orange-mid: #d94f18;
+  --color-orange-dim: #8a2e08;
+  --color-orange-soft: rgba(255, 107, 41, 0.12);
+
+  /* Neutrals */
+  --color-ink: #0a0a0a; /* page background */
+  --color-ink-2: #101010; /* raised surface */
+  --color-ink-3: #161616; /* card surface */
+  --color-paper: #ffffff;
+
+  /* Text on dark */
+  --color-fg: #ffffff;
+  --color-fg-muted: rgba(255, 255, 255, 0.72);
+  --color-fg-dim: rgba(255, 255, 255, 0.5);
+  --color-fg-faint: rgba(255, 255, 255, 0.32);
+
+  /* Lines / glass */
+  --color-line: rgba(255, 255, 255, 0.12);
+  --color-line-strong: rgba(255, 255, 255, 0.2);
+  --color-glass: rgba(255, 255, 255, 0.06);
+
+  /* Feedback */
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+
+  /* Radii */
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 32px;
+  --radius-xl: 48px;
+
+  /* Fonts (variables set in layout via next/font) */
+  --font-display: var(--font-syne), "Syne", sans-serif;
+  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+
+  /* Motion */
+  --ease-brand: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--color-ink);
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Utilities */
+@utility glass {
+  background: var(--color-glass);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid var(--color-line);
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+/* Selection + focus */
+::selection {
+  background: var(--color-orange);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-orange);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Thin scrollbar on dark */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
