@@ -21,6 +21,7 @@ import {
 import { StatusBadge } from "./StatusBadge";
 import { MilestoneTimeline } from "./MilestoneTimeline";
 import { OrderMessages } from "./OrderMessages";
+import { DeliverablesPanel } from "./DeliverablesPanel";
 import { Button } from "@/components/ui/Button";
 
 export function OrderDetail({
@@ -216,6 +217,10 @@ export function OrderDetail({
                   : "Progress will appear here once your project starts."}
             </div>
           )}
+
+          <div className="rounded-3xl border border-line bg-ink-3 p-6">
+            <DeliverablesPanel orderId={orderId} />
+          </div>
         </div>
 
         <div className="rounded-3xl border border-line bg-ink-3 p-6">

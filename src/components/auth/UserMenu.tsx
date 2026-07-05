@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
+import { LayoutDashboard, LogOut, ChevronDown, ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageProvider";
 import { useSupabaseUser } from "@/lib/supabase/useUser";
 import { createClient } from "@/lib/supabase/client";
@@ -13,7 +13,22 @@ export function UserMenu() {
   const { t } = useLanguage();
   const { user, loading } = useSupabaseUser();
   const [open, setOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      setIsAdmin(false);
+      return;
+    }
+    const supabase = createClient();
+    supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single()
+      .then(({ data }) => setIsAdmin(data?.role === "admin"));
+  }, [user]);
 
   if (loading) return null;
 
@@ -84,6 +99,17 @@ export function UserMenu() {
                 <LayoutDashboard className="h-4 w-4" />
                 {t.nav.dashboard}
               </Link>
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-fg-muted transition-colors hover:bg-glass hover:text-fg"
+                  role="menuitem"
+                >
+                  <ShieldCheck className="h-4 w-4" />
+                  Admin
+                </Link>
+              )}
               <button
                 onClick={signOut}
                 className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm text-fg-muted transition-colors hover:bg-glass hover:text-fg"
