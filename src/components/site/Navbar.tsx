@@ -17,6 +17,7 @@ import { useLanguage } from "@/i18n/LanguageProvider";
 import { categories } from "@/data/services";
 import { Logo } from "./Logo";
 import { LanguageToggle } from "./LanguageToggle";
+import { UserMenu } from "@/components/auth/UserMenu";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 
@@ -120,12 +121,7 @@ export function Navbar() {
         {/* Right cluster */}
         <div className="flex items-center gap-2">
           <LanguageToggle className="hidden sm:inline-flex" />
-          <Link
-            href="/login"
-            className="hidden rounded-full px-3 py-2 text-sm text-fg-muted transition-colors hover:text-fg md:inline-block"
-          >
-            {t.nav.login}
-          </Link>
+          <UserMenu />
           <Button href="/servicios" size="sm" className="hidden md:inline-flex">
             {t.nav.cta}
             <ArrowUpRight className="h-4 w-4" />
