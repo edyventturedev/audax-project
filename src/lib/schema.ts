@@ -9,17 +9,20 @@ import {
   SITE_DESCRIPTION,
   CONTACT_EMAIL,
   SOCIAL,
-  LOCATION,
+  COUNTRY,
 } from "./site";
 import { formatMXN, type Category, type Service } from "@/data/services";
 
 const ORG_ID = `${SITE_URL}/#organization`;
 
-/** Ficha del negocio (aparece como ProfessionalService/LocalBusiness). */
+/**
+ * Ficha del negocio como Organization NACIONAL (no LocalBusiness): así
+ * Google no lo ancla al "local pack" de una ciudad y compite a nivel país.
+ */
 export function organizationSchema() {
   return {
     "@context": "https://schema.org",
-    "@type": "ProfessionalService",
+    "@type": "Organization",
     "@id": ORG_ID,
     name: SITE_NAME,
     description: SITE_DESCRIPTION,
@@ -27,18 +30,8 @@ export function organizationSchema() {
     image: `${SITE_URL}/icon.png`,
     logo: `${SITE_URL}/icon.png`,
     email: CONTACT_EMAIL,
-    priceRange: "$$",
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: LOCATION.city,
-      addressRegion: LOCATION.region,
-      addressCountry: LOCATION.country,
-    },
-    areaServed: [
-      { "@type": "City", name: "Mérida" },
-      { "@type": "State", name: "Yucatán" },
-      { "@type": "Country", name: "México" },
-    ],
+    areaServed: { "@type": "Country", name: COUNTRY.name },
+    knowsLanguage: ["es-MX", "en"],
     sameAs: [SOCIAL.instagram],
   };
 }

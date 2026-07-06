@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { SITE_NAME } from "@/lib/site";
 
 export const alt =
-  "Audax Project — Desarrollo web y diseño en Mérida, Yucatán";
+  "Audax Project — Desarrollo web y diseño para todo México";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -67,7 +67,7 @@ export default function OpengraphImage() {
               color: "rgba(255,255,255,0.72)",
             }}
           >
-            Diseño · Web · Apps · Foto & Video — Mérida, Yucatán
+            Diseño · Web · Apps · Foto & Video — para todo México
           </div>
         </div>
 

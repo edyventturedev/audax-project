@@ -12,10 +12,10 @@ export const SITE_URL =
   envUrl && !envUrl.includes("localhost") ? envUrl : CANONICAL_FALLBACK;
 
 export const SITE_NAME = "Audax Project";
-export const SITE_TAGLINE = "Estudio creativo · Mérida, Yucatán";
+export const SITE_TAGLINE = "Estudio creativo digital · México";
 
 export const SITE_DESCRIPTION =
-  "Estudio creativo en Mérida, Yucatán: desarrollo web, diseño gráfico, apps, fotografía y video para negocios. Solicita, cotiza y paga en línea, y sigue el progreso de tu proyecto en un solo lugar.";
+  "Estudio creativo digital en México: desarrollo web, diseño gráfico, apps, e-commerce, fotografía y video para negocios de todo el país. Trabajamos 100% en línea: solicita, cotiza, paga y sigue el progreso de tu proyecto en un solo lugar.";
 
 export const CONTACT_EMAIL = "audaxcreativeproject@gmail.com";
 
@@ -23,24 +23,25 @@ export const SOCIAL = {
   instagram: "https://instagram.com/audaxproject",
 };
 
-export const LOCATION = {
-  city: "Mérida",
-  region: "Yucatán",
-  country: "MX",
-};
+// País de operación. Se atiende a todo México de forma remota.
+export const COUNTRY = { name: "México", code: "MX" };
 
-// Palabras clave de la marca/negocio para el posicionamiento local.
+// Palabras clave de la marca/negocio — enfoque NACIONAL (todo México).
 export const SITE_KEYWORDS = [
-  "desarrollo web Mérida",
-  "diseño web Yucatán",
-  "páginas web Mérida",
-  "diseño gráfico Mérida",
+  "desarrollo web México",
+  "diseño web México",
+  "páginas web México",
+  "agencia digital México",
+  "agencia creativa México",
+  "diseño gráfico México",
   "diseño de logotipos",
+  "diseño de marca",
   "e-commerce México",
-  "aplicaciones móviles",
+  "tiendas en línea México",
+  "desarrollo de apps México",
+  "aplicaciones móviles México",
+  "diseño UI/UX",
   "fotografía de producto",
-  "fotografía de restaurantes",
   "video para redes sociales",
-  "agencia creativa Mérida",
-  "estudio de diseño Yucatán",
+  "estudio creativo digital",
 ];

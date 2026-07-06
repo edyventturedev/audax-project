@@ -27,7 +27,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Audax Project — Desarrollo web y diseño en Mérida, Yucatán",
+    default: "Audax Project — Desarrollo web y diseño para todo México",
     template: "%s · Audax Project",
   },
   description: SITE_DESCRIPTION,
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   category: "business",
   formatDetection: { telephone: false },
   openGraph: {
-    title: "Audax Project — Desarrollo web y diseño en Mérida, Yucatán",
+    title: "Audax Project — Desarrollo web y diseño para todo México",
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     siteName: SITE_NAME,
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Audax Project — Estudio creativo en Mérida, Yucatán",
+    title: "Audax Project — Estudio creativo digital en México",
     description: SITE_DESCRIPTION,
   },
   robots: {

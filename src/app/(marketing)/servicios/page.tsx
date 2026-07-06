@@ -7,7 +7,7 @@ import { breadcrumbSchema, itemListSchema } from "@/lib/schema";
 export const metadata: Metadata = {
   title: "Catálogo de servicios — Diseño, web, apps, foto y video",
   description:
-    "Explora los servicios de Audax Project: desarrollo web, diseño gráfico, logotipos, e-commerce, apps, fotografía y video. Cotiza al instante y paga en línea desde Mérida, Yucatán.",
+    "Explora los servicios de Audax Project: desarrollo web, diseño gráfico, logotipos, e-commerce, apps, fotografía y video. Cotiza al instante y paga en línea desde cualquier parte de México.",
   alternates: { canonical: "/servicios" },
   openGraph: {
     title: "Catálogo de servicios — Audax Project",

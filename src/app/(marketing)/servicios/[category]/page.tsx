@@ -17,10 +17,10 @@ export async function generateMetadata({
   const category = getCategory(slug);
   if (!category) return { title: "Categoría no encontrada" };
 
-  const description = `${category.tagline.es} Cotiza al instante y sigue tu proyecto con Audax Project en Mérida, Yucatán.`;
+  const description = `${category.tagline.es} Cotiza al instante y sigue tu proyecto con Audax Project, 100% en línea para todo México.`;
 
   return {
-    title: `${category.name.es} en Mérida, Yucatán`,
+    title: `${category.name.es} en México`,
     description,
     alternates: { canonical: `/servicios/${category.slug}` },
     openGraph: {

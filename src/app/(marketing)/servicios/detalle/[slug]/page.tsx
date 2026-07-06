@@ -22,14 +22,15 @@ export async function generateMetadata({
     service.pricingType === "fixed"
       ? `Desde ${formatMXN(service.priceMin)}`
       : `${formatMXN(service.priceMin)}–${formatMXN(service.priceMax)}`;
-  const description = `${service.desc.es} ${priceLine}. Solicita, paga en línea y sigue tu proyecto con Audax Project en Mérida, Yucatán.`;
+  const description = `${service.desc.es} ${priceLine}. Solicita, paga en línea y sigue tu proyecto con Audax Project, 100% en línea para todo México.`;
 
   return {
     title: `${service.name.es} · ${category?.name.es ?? "Servicios"}`,
     description,
     keywords: [
       service.name.es,
-      `${service.name.es} Mérida`,
+      `${service.name.es} México`,
+      `${service.name.es} en línea`,
       category?.name.es ?? "",
       "Audax Project",
     ].filter(Boolean),
