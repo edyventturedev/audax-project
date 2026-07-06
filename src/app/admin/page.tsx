@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Loader2, ArrowUpRight } from "lucide-react";
+import { Loader2, ArrowUpRight, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { deleteOrderCompletely } from "@/lib/deleteOrder";
 import { formatCentsMXN, type OrderStatus } from "@/lib/orders";
 import { StatusBadge } from "@/components/app/StatusBadge";
 import { cn } from "@/lib/cn";
@@ -31,6 +32,8 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<OrderStatus | "all">("all");
+  const [confirmingClean, setConfirmingClean] = useState(false);
+  const [cleaning, setCleaning] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -61,12 +64,74 @@ export default function AdminOrdersPage() {
   const shown =
     filter === "all" ? orders : orders.filter((o) => o.status === filter);
 
+  const deliveredCount = orders.filter((o) => o.status === "delivered").length;
+
+  async function cleanDelivered() {
+    setCleaning(true);
+    const supabase = createClient();
+    const delivered = orders.filter((o) => o.status === "delivered");
+    for (const o of delivered) {
+      try {
+        await deleteOrderCompletely(supabase, o.id);
+      } catch {
+        // continúa con los demás aunque uno falle
+      }
+    }
+    setCleaning(false);
+    setConfirmingClean(false);
+  }
+
   return (
     <div>
-      <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight">
-        Pedidos
-      </h1>
-      <p className="mt-2 text-fg-muted">Gestiona cotizaciones, progreso y entregas.</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight">
+            Pedidos
+          </h1>
+          <p className="mt-2 text-fg-muted">
+            Gestiona cotizaciones, progreso y entregas.
+          </p>
+        </div>
+
+        {/* Limpiar todos los entregados de una vez */}
+        {deliveredCount > 0 &&
+          (!confirmingClean ? (
+            <button
+              onClick={() => setConfirmingClean(true)}
+              className="inline-flex items-center gap-2 rounded-full border border-danger/40 px-4 py-2 text-sm font-medium text-danger transition-colors hover:bg-danger/10"
+            >
+              <Trash2 className="h-4 w-4" />
+              Limpiar entregados ({deliveredCount})
+            </button>
+          ) : (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-fg-muted">
+                ¿Eliminar {deliveredCount} pedido
+                {deliveredCount === 1 ? "" : "s"} entregado
+                {deliveredCount === 1 ? "" : "s"}?
+              </span>
+              <button
+                onClick={cleanDelivered}
+                disabled={cleaning}
+                className="inline-flex items-center gap-2 rounded-full bg-danger px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-danger/90 disabled:opacity-60"
+              >
+                {cleaning ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+                Sí, limpiar
+              </button>
+              <button
+                onClick={() => setConfirmingClean(false)}
+                disabled={cleaning}
+                className="rounded-full border border-line px-4 py-2 text-sm font-medium text-fg-muted transition-colors hover:text-fg disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+            </div>
+          ))}
+      </div>
 
       <div className="mt-6 flex flex-wrap gap-2">
         {FILTERS.map((f) => (

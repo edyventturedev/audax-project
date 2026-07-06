@@ -2,8 +2,18 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Loader2, Plus, Check, Clock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  ArrowLeft,
+  Loader2,
+  Plus,
+  Check,
+  Clock,
+  Trash2,
+  AlertTriangle,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { deleteOrderCompletely } from "@/lib/deleteOrder";
 import {
   STATUS_META,
   formatCentsMXN,
@@ -48,7 +58,10 @@ export function AdminOrderManager({
   const [quoteAmount, setQuoteAmount] = useState("");
   const [savingQuote, setSavingQuote] = useState(false);
   const [newMilestone, setNewMilestone] = useState("");
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
+  const router = useRouter();
   const supabase = createClient();
 
   async function load() {
@@ -112,6 +125,19 @@ export function AdminOrderManager({
     load();
   }
 
+  async function deleteOrder() {
+    setDeleting(true);
+    try {
+      await deleteOrderCompletely(supabase, orderId);
+      router.push("/admin");
+      router.refresh();
+    } catch {
+      setDeleting(false);
+      setConfirmingDelete(false);
+      alert("No se pudo eliminar el pedido. Inténtalo de nuevo.");
+    }
+  }
+
   if (loading)
     return (
       <div className="flex justify-center py-24">
@@ -126,6 +152,9 @@ export function AdminOrderManager({
 
   const isPaid = (
     ["paid", "in_progress", "review", "delivered"] as OrderStatus[]
+  ).includes(order.status);
+  const isCompleted = (
+    ["delivered", "cancelled"] as OrderStatus[]
   ).includes(order.status);
 
   return (
@@ -293,6 +322,57 @@ export function AdminOrderManager({
               </div>
             </>
           )}
+
+          {/* Zona de peligro — eliminar / limpiar el pedido */}
+          <div className="rounded-3xl border border-danger/25 bg-danger/5 p-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-danger" />
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-fg">
+                  Eliminar pedido
+                </h3>
+                <p className="mt-1 text-sm text-fg-muted">
+                  {isCompleted
+                    ? "Este proyecto está completado. Puedes eliminarlo para mantener el panel limpio."
+                    : "Elimina este pedido de forma permanente. Ideal para limpiar proyectos ya entregados."}{" "}
+                  Se borrarán también sus hitos, mensajes y archivos. Esta
+                  acción no se puede deshacer.
+                </p>
+
+                {!confirmingDelete ? (
+                  <button
+                    onClick={() => setConfirmingDelete(true)}
+                    className="mt-4 inline-flex items-center gap-2 rounded-full border border-danger/40 px-4 py-1.5 text-sm font-medium text-danger transition-colors hover:bg-danger/10"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Eliminar pedido
+                  </button>
+                ) : (
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <button
+                      onClick={deleteOrder}
+                      disabled={deleting}
+                      className="inline-flex items-center gap-2 rounded-full bg-danger px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-danger/90 disabled:opacity-60"
+                    >
+                      {deleting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                      Sí, eliminar definitivamente
+                    </button>
+                    <button
+                      onClick={() => setConfirmingDelete(false)}
+                      disabled={deleting}
+                      className="rounded-full border border-line px-4 py-1.5 text-sm font-medium text-fg-muted transition-colors hover:text-fg disabled:opacity-60"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="rounded-3xl border border-line bg-ink-3 p-6">
