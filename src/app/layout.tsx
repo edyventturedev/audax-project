@@ -2,6 +2,14 @@ import type { Metadata } from "next";
 import { Syne, Inter } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/i18n/LanguageProvider";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { organizationSchema, websiteSchema } from "@/lib/schema";
+import {
+  SITE_URL,
+  SITE_NAME,
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+} from "@/lib/site";
 
 const syne = Syne({
   variable: "--font-syne",
@@ -19,18 +27,42 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Audax Project — Estudio creativo · Mérida, Yucatán",
+    default: "Audax Project — Desarrollo web y diseño en Mérida, Yucatán",
     template: "%s · Audax Project",
   },
-  description:
-    "Foto, video, diseño y desarrollo digital para negocios que quieren destacar. Solicita, cotiza y da seguimiento a tu proyecto en un solo lugar.",
-  metadataBase: new URL("https://audaxproject.mx"),
+  description: SITE_DESCRIPTION,
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
+  keywords: SITE_KEYWORDS,
+  authors: [{ name: SITE_NAME }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  alternates: { canonical: "/" },
+  category: "business",
+  formatDetection: { telephone: false },
   openGraph: {
-    title: "Audax Project — Estudio creativo",
-    description:
-      "Solicita un servicio, recibe tu cotización y sigue el progreso de tu proyecto.",
+    title: "Audax Project — Desarrollo web y diseño en Mérida, Yucatán",
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
     type: "website",
     locale: "es_MX",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Audax Project — Estudio creativo en Mérida, Yucatán",
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 };
 
@@ -52,6 +84,8 @@ export default function RootLayout({
         >
           Saltar al contenido
         </a>
+        <JsonLd data={organizationSchema()} />
+        <JsonLd data={websiteSchema()} />
         <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>

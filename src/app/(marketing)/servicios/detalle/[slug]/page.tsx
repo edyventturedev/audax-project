@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { getService, getCategory, services, formatMXN } from "@/data/services";
 import { ServiceDetailView } from "@/components/service/ServiceDetailView";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbSchema, serviceSchema } from "@/lib/schema";
 
 export function generateStaticParams() {
   return services.map((s) => ({ slug: s.slug }));
@@ -20,15 +22,22 @@ export async function generateMetadata({
     service.pricingType === "fixed"
       ? `Desde ${formatMXN(service.priceMin)}`
       : `${formatMXN(service.priceMin)}–${formatMXN(service.priceMax)}`;
-  const description = `${service.desc.es} ${priceLine}. Solicita, paga en línea y sigue tu proyecto con Audax.`;
+  const description = `${service.desc.es} ${priceLine}. Solicita, paga en línea y sigue tu proyecto con Audax Project en Mérida, Yucatán.`;
 
   return {
     title: `${service.name.es} · ${category?.name.es ?? "Servicios"}`,
     description,
+    keywords: [
+      service.name.es,
+      `${service.name.es} Mérida`,
+      category?.name.es ?? "",
+      "Audax Project",
+    ].filter(Boolean),
     alternates: { canonical: `/servicios/detalle/${service.slug}` },
     openGraph: {
       title: `${service.name.es} — Audax Project`,
       description,
+      url: `/servicios/detalle/${service.slug}`,
       type: "website",
     },
   };
@@ -40,5 +49,35 @@ export default async function ServiceDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  return <ServiceDetailView slug={slug} />;
+  const service = getService(slug);
+  const category = service ? getCategory(service.category) : undefined;
+
+  return (
+    <>
+      {service && (
+        <>
+          <JsonLd data={serviceSchema(service, category)} />
+          <JsonLd
+            data={breadcrumbSchema([
+              { name: "Inicio", path: "/" },
+              { name: "Servicios", path: "/servicios" },
+              ...(category
+                ? [
+                    {
+                      name: category.name.es,
+                      path: `/servicios/${category.slug}`,
+                    },
+                  ]
+                : []),
+              {
+                name: service.name.es,
+                path: `/servicios/detalle/${service.slug}`,
+              },
+            ])}
+          />
+        </>
+      )}
+      <ServiceDetailView slug={slug} />
+    </>
+  );
 }

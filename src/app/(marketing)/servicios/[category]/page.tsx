@@ -1,37 +1,60 @@
-"use client";
+import type { Metadata } from "next";
+import { getCategory, categories, servicesByCategory } from "@/data/services";
+import { CategoryClient } from "@/components/site/CategoryClient";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbSchema, itemListSchema } from "@/lib/schema";
 
-import { useParams, notFound } from "next/navigation";
-import { useLanguage } from "@/i18n/LanguageProvider";
-import {
-  getCategory,
-  servicesByCategory,
-  type CategorySlug,
-} from "@/data/services";
-import { CatalogHeader } from "@/components/site/CatalogHeader";
-import { ServiceCard } from "@/components/site/ServiceCard";
-import { RevealGroup, RevealItem } from "@/components/motion/Reveal";
+export function generateStaticParams() {
+  return categories.map((c) => ({ category: c.slug }));
+}
 
-export default function CategoryPage() {
-  const { lang } = useLanguage();
-  const params = useParams<{ category: string }>();
-  const category = getCategory(params.category);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ category: string }>;
+}): Promise<Metadata> {
+  const { category: slug } = await params;
+  const category = getCategory(slug);
+  if (!category) return { title: "Categoría no encontrada" };
 
-  if (!category) return notFound();
+  const description = `${category.tagline.es} Cotiza al instante y sigue tu proyecto con Audax Project en Mérida, Yucatán.`;
 
-  const list = servicesByCategory(category.slug as CategorySlug);
+  return {
+    title: `${category.name.es} en Mérida, Yucatán`,
+    description,
+    alternates: { canonical: `/servicios/${category.slug}` },
+    openGraph: {
+      title: `${category.name.es} — Audax Project`,
+      description,
+      url: `/servicios/${category.slug}`,
+      type: "website",
+    },
+  };
+}
+
+export default async function CategoryPage({
+  params,
+}: {
+  params: Promise<{ category: string }>;
+}) {
+  const { category: slug } = await params;
+  const category = getCategory(slug);
 
   return (
-    <div className="pb-10">
-      <CatalogHeader title={category.name[lang]} sub={category.tagline[lang]} />
-      <div className="mx-auto mt-14 max-w-[1100px] px-6">
-        <RevealGroup className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((s) => (
-            <RevealItem key={s.slug}>
-              <ServiceCard service={s} />
-            </RevealItem>
-          ))}
-        </RevealGroup>
-      </div>
-    </div>
+    <>
+      {category && (
+        <>
+          <JsonLd
+            data={breadcrumbSchema([
+              { name: "Inicio", path: "/" },
+              { name: "Servicios", path: "/servicios" },
+              { name: category.name.es, path: `/servicios/${category.slug}` },
+            ])}
+          />
+          <JsonLd data={itemListSchema(servicesByCategory(category.slug))} />
+        </>
+      )}
+      <CategoryClient slug={slug} />
+    </>
   );
 }

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { SITE_URL } from "@/lib/supabase/env";
+import { SITE_URL } from "@/lib/site";
 import { categories, services } from "@/data/services";
 
 export default function sitemap(): MetadataRoute.Sitemap {
