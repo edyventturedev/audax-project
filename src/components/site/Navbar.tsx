@@ -70,7 +70,11 @@ export function Navbar() {
         <motion.nav
           initial={false}
           animate={{ borderRadius: menuOpen ? 28 : 999 }}
-          transition={ISLAND_SPRING}
+          transition={
+            menuOpen
+              ? ISLAND_SPRING
+              : { duration: 0.2, ease: [0.4, 0, 1, 1] }
+          }
           // Al abrir usamos fondo SÓLIDO sin backdrop-blur: animar un
           // backdrop-filter en iOS es lo que causa el "tirón". El blur solo
           // se aplica en estado compacto (estático, sin costo por frame).
@@ -190,11 +194,24 @@ export function Navbar() {
               <motion.div
                 key="island-menu"
                 initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{
-                  height: ISLAND_SPRING,
-                  opacity: { duration: 0.2 },
+                animate={{
+                  height: "auto",
+                  opacity: 1,
+                  // Entrada: resorte suave (el "morph" con carácter).
+                  transition: {
+                    height: ISLAND_SPRING,
+                    opacity: { duration: 0.18 },
+                  },
+                }}
+                exit={{
+                  height: 0,
+                  opacity: 0,
+                  // Salida: tween corto y directo (más rápido que la entrada,
+                  // sin cola de resorte) => cierre ligero en cualquier equipo.
+                  transition: {
+                    height: { duration: 0.2, ease: [0.4, 0, 1, 1] },
+                    opacity: { duration: 0.12 },
+                  },
                 }}
                 className="overflow-hidden lg:hidden"
               >
