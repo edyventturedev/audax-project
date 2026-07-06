@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Audax Project — Web app
 
-## Getting Started
+Plataforma de servicios creativos (tipo Fiverr, sin la fricción de "en quién confiar"):
+el cliente elige un servicio, recibe cotización o paga precio fijo, **paga en línea** y
+**sigue el progreso** de su proyecto en un panel privado. Incluye panel de administración
+para cotizar, gestionar avances y entregar archivos.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router) + **TypeScript** + **Tailwind CSS v4**
+- **Framer Motion** (animaciones)
+- **Supabase** — Postgres + Auth (Google + email) + Storage, con **RLS**
+- **Stripe** — pagos (Checkout) + webhooks
+- i18n ligero **ES/EN**
+
+## Desarrollo local
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Necesitas un archivo `.env.local` con las claves de Supabase y Stripe.
+Ver **[SETUP.md](./SETUP.md)** para la configuración completa (Supabase, Google OAuth,
+Stripe, migraciones SQL).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Para el webhook de Stripe en local:
+```bash
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Base de datos
 
-## Learn More
+Migraciones en [`supabase/migrations/`](./supabase/migrations) — ejecútalas en orden en el
+SQL Editor de Supabase. Definen tablas, RLS, trigger de perfiles, semilla de servicios,
+realtime y políticas de Storage.
 
-To learn more about Next.js, take a look at the following resources:
+## Despliegue
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Ver **[DEPLOY.md](./DEPLOY.md)** (Vercel + variables de entorno + webhook de producción).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Estructura
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+  app/                 rutas (marketing, auth, app/dashboard, admin, api)
+  components/          UI: site, landing, auth, app, service, ui, motion
+  data/services.ts     catálogo de servicios (fuente + semilla)
+  i18n/                diccionario ES/EN + provider
+  lib/                 supabase (client/server/admin), stripe, orders, utils
+supabase/migrations/   esquema SQL + RLS + seeds
+legacy/                sitio estático anterior (referencia)
+```

@@ -8,7 +8,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="relative flex min-h-dvh flex-col items-center justify-center px-6 py-16">
+    <main id="main" className="relative flex min-h-dvh flex-col items-center justify-center px-6 py-16">
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-0 h-[400px] w-[700px] -translate-x-1/2 rounded-full opacity-50 blur-[120px]"

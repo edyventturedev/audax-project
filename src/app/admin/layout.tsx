@@ -25,7 +25,7 @@ export default async function AdminLayout({
   return (
     <>
       <AdminHeader />
-      <main className="mx-auto min-h-dvh max-w-[1100px] px-6 py-10">
+      <main id="main" className="mx-auto min-h-dvh max-w-[1100px] px-6 py-10">
         {children}
       </main>
     </>
