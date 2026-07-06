@@ -81,11 +81,27 @@ body {
 }
 
 /* Utilities */
+/*
+  "Liquid glass" — panel translúcido tipo iOS pero con base opaca:
+  se percibe el frost y el brillo superior, pero NADA legible se ve a través.
+  Capa 1 (arriba): brillo blanco superior (el "rim" de vidrio líquido).
+  Capa 2 (base): tinte oscuro casi sólido (0.92) que bloquea el fondo.
+*/
 @utility glass {
-  background: var(--color-glass);
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  border: 1px solid var(--color-line);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.02) 42%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    rgba(20, 20, 22, 0.92);
+  backdrop-filter: blur(28px) saturate(1.7);
+  -webkit-backdrop-filter: blur(28px) saturate(1.7);
+  border: 1px solid var(--color-line-strong);
+  box-shadow:
+    0 16px 44px -14px rgba(0, 0, 0, 0.72),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09);
 }
 
 @utility text-balance {
