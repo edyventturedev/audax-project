@@ -67,21 +67,11 @@ export function Navbar() {
           )}
         </AnimatePresence>
 
-        {/* La isla */}
-        <motion.nav
-          initial={false}
-          animate={{ borderRadius: menuOpen ? 28 : 999 }}
-          transition={{ duration: menuOpen ? 0.24 : 0.18, ease: menuOpen ? EASE_OUT : EASE_IN }}
-          // Al abrir usamos fondo SÓLIDO sin backdrop-blur: animar un
-          // backdrop-filter en iOS es lo que causa el "tirón". El blur solo
-          // se aplica en estado compacto (estático, sin costo por frame).
+        {/* La píldora (queda fija; el menú flota debajo) */}
+        <nav
           className={cn(
-            "relative w-full max-w-[1100px] border border-line transition-[background-color] duration-300 [transform:translateZ(0)]",
-            menuOpen
-              ? "bg-ink-2"
-              : scrolled
-                ? "bg-ink/85 backdrop-blur-xl"
-                : "bg-ink/70 backdrop-blur-xl",
+            "relative w-full max-w-[1100px] rounded-full border border-line transition-[background-color] duration-300 [transform:translateZ(0)]",
+            scrolled ? "bg-ink/85 backdrop-blur-xl" : "bg-ink/70 backdrop-blur-xl",
           )}
         >
           {/* Fila superior (siempre visible) */}
@@ -185,33 +175,21 @@ export function Navbar() {
             </div>
           </div>
 
-          {/* Menú móvil que crece DESDE la isla (Dynamic Island).
-              Animación ligera: una sola transición de altura + opacidad,
-              sin resortes ni escalonado (nada por-frame en cada fila). */}
-          <AnimatePresence initial={false}>
+          {/* Menú móvil: panel flotante que hace "pop" desde la píldora.
+              Solo anima opacity + scale + translateY (GPU, sin recalcular
+              layout) => fluido de principio a fin en cualquier iPhone. */}
+          <AnimatePresence>
             {menuOpen && (
               <motion.div
                 key="island-menu"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{
-                  height: "auto",
-                  opacity: 1,
-                  transition: {
-                    height: { duration: 0.26, ease: EASE_OUT },
-                    opacity: { duration: 0.2, ease: EASE_OUT },
-                  },
-                }}
-                exit={{
-                  height: 0,
-                  opacity: 0,
-                  transition: {
-                    height: { duration: 0.18, ease: EASE_IN },
-                    opacity: { duration: 0.12, ease: EASE_IN },
-                  },
-                }}
-                className="overflow-hidden lg:hidden"
+                initial={{ opacity: 0, scale: 0.96, y: -6 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.97, y: -6 }}
+                transition={{ duration: menuOpen ? 0.22 : 0.15, ease: menuOpen ? EASE_OUT : EASE_IN }}
+                style={{ transformOrigin: "top center", willChange: "transform, opacity" }}
+                className="absolute inset-x-0 top-full mt-2 origin-top rounded-3xl border border-line bg-ink-2 shadow-2xl lg:hidden"
               >
-                <div className="flex flex-col gap-1 px-3 pb-3 pt-1">
+                <div className="flex flex-col gap-1 p-3">
                   {categories.map((c) => {
                     const Icon = iconMap[c.icon as keyof typeof iconMap];
                     return (
@@ -259,7 +237,7 @@ export function Navbar() {
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.nav>
+        </nav>
       </header>
     </MotionConfig>
   );
