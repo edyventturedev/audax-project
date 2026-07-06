@@ -7,7 +7,7 @@ export default function NotFound() {
     <main className="relative flex min-h-dvh flex-col items-center justify-center px-6 text-center">
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/3 h-80 w-[600px] -translate-x-1/2 rounded-full opacity-40 blur-[120px]"
+        className="pointer-events-none absolute left-1/2 top-1/3 h-80 w-[600px] -translate-x-1/2 rounded-full opacity-40 blur-[64px]"
         style={{
           background:
             "radial-gradient(circle, rgba(255,107,41,0.25) 0%, transparent 70%)",

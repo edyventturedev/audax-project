@@ -61,7 +61,7 @@ export function Navbar() {
               transition={{ duration: 0.25 }}
               onClick={closeMenu}
               aria-label="Cerrar menú"
-              className="fixed inset-0 top-0 -z-10 bg-ink/60 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 top-0 -z-10 bg-ink/70 lg:hidden"
             />
           )}
         </AnimatePresence>
@@ -71,13 +71,16 @@ export function Navbar() {
           initial={false}
           animate={{ borderRadius: menuOpen ? 28 : 999 }}
           transition={ISLAND_SPRING}
+          // Al abrir usamos fondo SÓLIDO sin backdrop-blur: animar un
+          // backdrop-filter en iOS es lo que causa el "tirón". El blur solo
+          // se aplica en estado compacto (estático, sin costo por frame).
           className={cn(
-            "relative w-full max-w-[1100px] border border-line backdrop-blur-2xl transition-[background-color] duration-300",
+            "relative w-full max-w-[1100px] border border-line transition-[background-color] duration-300 [transform:translateZ(0)]",
             menuOpen
-              ? "bg-ink-2/95"
+              ? "bg-ink-2"
               : scrolled
-                ? "bg-ink/85"
-                : "bg-ink/60",
+                ? "bg-ink/85 backdrop-blur-xl"
+                : "bg-ink/70 backdrop-blur-xl",
           )}
         >
           {/* Fila superior (siempre visible) */}

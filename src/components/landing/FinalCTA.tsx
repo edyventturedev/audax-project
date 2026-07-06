@@ -14,7 +14,7 @@ export function FinalCTA() {
         <div className="relative mx-auto max-w-[1100px] overflow-hidden rounded-[40px] border border-line bg-ink-3 px-6 py-16 text-center sm:py-20">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 -top-24 h-64 opacity-70 blur-[100px]"
+            className="pointer-events-none absolute inset-x-0 -top-24 h-64 opacity-70 blur-[56px]"
             style={{
               background:
                 "radial-gradient(closest-side, rgba(255,107,41,0.35), transparent)",

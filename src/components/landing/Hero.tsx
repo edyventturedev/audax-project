@@ -19,7 +19,7 @@ export function Hero() {
       {/* Ambient glow */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-24 h-[520px] w-[820px] -translate-x-1/2 rounded-full opacity-60 blur-[120px]"
+        className="pointer-events-none absolute left-1/2 top-24 h-[420px] w-[680px] -translate-x-1/2 rounded-full opacity-60 blur-[64px]"
         style={{
           background:
             "radial-gradient(circle, rgba(255,107,41,0.28) 0%, transparent 70%)",

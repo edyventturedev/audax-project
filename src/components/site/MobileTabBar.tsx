@@ -85,7 +85,7 @@ export function MobileTabBar() {
         className="fixed inset-x-3 z-[900] lg:hidden"
         style={{ bottom: "calc(0.6rem + env(safe-area-inset-bottom))" }}
       >
-        <ul className="flex items-stretch gap-1 rounded-[26px] border border-line bg-ink/85 p-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
+        <ul className="flex items-stretch gap-1 rounded-[26px] border border-line bg-ink/92 p-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.45)] backdrop-blur-md [transform:translateZ(0)]">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = tab.key === active;
