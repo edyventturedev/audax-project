@@ -40,7 +40,9 @@ export function AppHeader() {
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <LanguageToggle className="hidden sm:inline-flex" />
+          <div className="hidden sm:flex">
+            <LanguageToggle />
+          </div>
           <UserMenu />
         </div>
       </div>

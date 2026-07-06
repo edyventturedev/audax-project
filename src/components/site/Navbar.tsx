@@ -118,14 +118,17 @@ export function Navbar() {
           </Link>
         </div>
 
-        {/* Right cluster */}
+        {/* Right cluster — toggle y CTA solo en escritorio (el wrapper
+            garantiza el ocultamiento; en móvil viven en el menú y tab bar) */}
         <div className="flex items-center gap-2">
-          <LanguageToggle className="hidden lg:inline-flex" />
+          <div className="hidden items-center gap-2 lg:flex">
+            <LanguageToggle />
+            <Button href="/servicios" size="sm">
+              {t.nav.cta}
+              <ArrowUpRight className="h-4 w-4" />
+            </Button>
+          </div>
           <UserMenu />
-          <Button href="/servicios" size="sm" className="hidden lg:inline-flex">
-            {t.nav.cta}
-            <ArrowUpRight className="h-4 w-4" />
-          </Button>
           <button
             type="button"
             onClick={() => setMenuOpen((o) => !o)}
