@@ -23,8 +23,9 @@ import { cn } from "@/lib/cn";
 
 const iconMap = { Palette, Code2, Camera, Package };
 
-// Spring compartido: da el "morph" fluido tipo Dynamic Island.
-const ISLAND_SPRING = { type: "spring" as const, stiffness: 380, damping: 34 };
+// Curva de salida rápida (ease-in) reutilizable.
+const EASE_OUT = [0.16, 1, 0.3, 1] as const;
+const EASE_IN = [0.4, 0, 1, 1] as const;
 
 export function Navbar() {
   const { t, lang } = useLanguage();
@@ -70,11 +71,7 @@ export function Navbar() {
         <motion.nav
           initial={false}
           animate={{ borderRadius: menuOpen ? 28 : 999 }}
-          transition={
-            menuOpen
-              ? ISLAND_SPRING
-              : { duration: 0.2, ease: [0.4, 0, 1, 1] }
-          }
+          transition={{ duration: menuOpen ? 0.24 : 0.18, ease: menuOpen ? EASE_OUT : EASE_IN }}
           // Al abrir usamos fondo SÓLIDO sin backdrop-blur: animar un
           // backdrop-filter en iOS es lo que causa el "tirón". El blur solo
           // se aplica en estado compacto (estático, sin costo por frame).
@@ -175,7 +172,7 @@ export function Navbar() {
               >
                 <motion.span
                   animate={{ rotate: menuOpen ? 90 : 0 }}
-                  transition={ISLAND_SPRING}
+                  transition={{ duration: 0.2, ease: EASE_OUT }}
                   className="flex"
                 >
                   {menuOpen ? (
@@ -188,7 +185,9 @@ export function Navbar() {
             </div>
           </div>
 
-          {/* Menú móvil que crece DESDE la isla (Dynamic Island) */}
+          {/* Menú móvil que crece DESDE la isla (Dynamic Island).
+              Animación ligera: una sola transición de altura + opacidad,
+              sin resortes ni escalonado (nada por-frame en cada fila). */}
           <AnimatePresence initial={false}>
             {menuOpen && (
               <motion.div
@@ -197,112 +196,71 @@ export function Navbar() {
                 animate={{
                   height: "auto",
                   opacity: 1,
-                  // Entrada: resorte suave (el "morph" con carácter).
                   transition: {
-                    height: ISLAND_SPRING,
-                    opacity: { duration: 0.18 },
+                    height: { duration: 0.26, ease: EASE_OUT },
+                    opacity: { duration: 0.2, ease: EASE_OUT },
                   },
                 }}
                 exit={{
                   height: 0,
                   opacity: 0,
-                  // Salida: tween corto y directo (más rápido que la entrada,
-                  // sin cola de resorte) => cierre ligero en cualquier equipo.
                   transition: {
-                    height: { duration: 0.2, ease: [0.4, 0, 1, 1] },
-                    opacity: { duration: 0.12 },
+                    height: { duration: 0.18, ease: EASE_IN },
+                    opacity: { duration: 0.12, ease: EASE_IN },
                   },
                 }}
                 className="overflow-hidden lg:hidden"
               >
-                <motion.div
-                  variants={{
-                    open: { transition: { staggerChildren: 0.035, delayChildren: 0.05 } },
-                    closed: {},
-                  }}
-                  initial="closed"
-                  animate="open"
-                  exit="closed"
-                  className="flex flex-col gap-1 px-3 pb-3 pt-1"
-                >
+                <div className="flex flex-col gap-1 px-3 pb-3 pt-1">
                   {categories.map((c) => {
                     const Icon = iconMap[c.icon as keyof typeof iconMap];
                     return (
-                      <MenuRow key={c.slug}>
-                        <Link
-                          href={`/servicios/${c.slug}`}
-                          onClick={closeMenu}
-                          className="flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-glass"
-                        >
-                          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-soft text-orange">
-                            <Icon className="h-4 w-4" />
-                          </span>
-                          <span className="text-sm font-medium">
-                            {c.name[lang]}
-                          </span>
-                        </Link>
-                      </MenuRow>
+                      <Link
+                        key={c.slug}
+                        href={`/servicios/${c.slug}`}
+                        onClick={closeMenu}
+                        className="flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-glass"
+                      >
+                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-soft text-orange">
+                          <Icon className="h-4 w-4" />
+                        </span>
+                        <span className="text-sm font-medium">
+                          {c.name[lang]}
+                        </span>
+                      </Link>
                     );
                   })}
 
-                  <MenuRow>
-                    <div className="my-1 h-px bg-line" />
-                  </MenuRow>
-                  <MenuRow>
-                    <Link
-                      href="/#how"
-                      onClick={closeMenu}
-                      className="block rounded-xl px-3 py-3 text-sm text-fg-muted hover:bg-glass"
-                    >
-                      {t.nav.process}
-                    </Link>
-                  </MenuRow>
-                  <MenuRow>
-                    <Link
-                      href="/#why"
-                      onClick={closeMenu}
-                      className="block rounded-xl px-3 py-3 text-sm text-fg-muted hover:bg-glass"
-                    >
-                      {t.nav.why}
-                    </Link>
-                  </MenuRow>
-                  <MenuRow>
-                    <div className="my-1 h-px bg-line" />
-                  </MenuRow>
-                  <MenuRow>
-                    <div className="flex items-center justify-between px-3 py-2">
-                      <span className="text-sm text-fg-dim">
-                        {t.nav.language}
-                      </span>
-                      <LanguageToggle />
-                    </div>
-                  </MenuRow>
-                  <MenuRow>
-                    <Button href="/servicios" size="lg" className="mt-1 w-full">
-                      {t.nav.cta}
-                      <ArrowUpRight className="h-4 w-4" />
-                    </Button>
-                  </MenuRow>
-                </motion.div>
+                  <div className="my-1 h-px bg-line" />
+                  <Link
+                    href="/#how"
+                    onClick={closeMenu}
+                    className="block rounded-xl px-3 py-3 text-sm text-fg-muted hover:bg-glass"
+                  >
+                    {t.nav.process}
+                  </Link>
+                  <Link
+                    href="/#why"
+                    onClick={closeMenu}
+                    className="block rounded-xl px-3 py-3 text-sm text-fg-muted hover:bg-glass"
+                  >
+                    {t.nav.why}
+                  </Link>
+                  <div className="my-1 h-px bg-line" />
+                  <div className="flex items-center justify-between px-3 py-2">
+                    <span className="text-sm text-fg-dim">{t.nav.language}</span>
+                    <LanguageToggle />
+                  </div>
+                  <Button href="/servicios" size="lg" className="mt-1 w-full">
+                    {t.nav.cta}
+                    <ArrowUpRight className="h-4 w-4" />
+                  </Button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </motion.nav>
       </header>
     </MotionConfig>
-  );
-}
-
-function MenuRow({ children }: { children: React.ReactNode }) {
-  return (
-    <motion.div
-      variants={{
-        closed: { opacity: 0, y: -8 },
-        open: { opacity: 1, y: 0 },
-      }}
-      transition={{ duration: 0.2 }}
-    >
-      {children}
-    </motion.div>
   );
 }
