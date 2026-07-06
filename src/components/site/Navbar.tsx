@@ -120,9 +120,9 @@ export function Navbar() {
 
         {/* Right cluster */}
         <div className="flex items-center gap-2">
-          <LanguageToggle className="hidden sm:inline-flex" />
+          <LanguageToggle className="hidden lg:inline-flex" />
           <UserMenu />
-          <Button href="/servicios" size="sm" className="hidden md:inline-flex">
+          <Button href="/servicios" size="sm" className="hidden lg:inline-flex">
             {t.nav.cta}
             <ArrowUpRight className="h-4 w-4" />
           </Button>
