@@ -9,6 +9,8 @@ import {
   CheckCircle2,
   CreditCard,
   FileText,
+  ShieldCheck,
+  Clock,
 } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageProvider";
 import { createClient } from "@/lib/supabase/client";
@@ -128,6 +130,9 @@ export function OrderDetail({
 
   const canPay =
     (order.status as OrderStatus) === "quoted" && order.amount_total != null;
+  const isPaid = (
+    ["paid", "in_progress", "review", "delivered"] as OrderStatus[]
+  ).includes(order.status);
 
   return (
     <div>
@@ -167,24 +172,38 @@ export function OrderDetail({
       </p>
 
       {canPay && (
-        <div className="mt-6 flex flex-col items-start gap-3 rounded-2xl border border-orange/30 bg-orange-soft p-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="font-semibold text-fg">
-              {es ? "Tu cotización está lista" : "Your quote is ready"}
-            </p>
-            <p className="text-sm text-fg-muted">
-              {formatCentsMXN(order.amount_total)} —{" "}
-              {es ? "paga para arrancar" : "pay to get started"}
-            </p>
+        <div className="mt-6 overflow-hidden rounded-3xl border border-orange/40 bg-orange-soft p-6">
+          <p className="text-xs font-semibold uppercase tracking-wider text-orange">
+            {es ? "Tu cotización está lista" : "Your quote is ready"}
+          </p>
+          <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="font-[family-name:var(--font-display)] text-4xl font-extrabold tabular-nums text-fg">
+                {formatCentsMXN(order.amount_total)}
+              </p>
+              <p className="mt-1 text-sm text-fg-muted">
+                {es
+                  ? "Confirma y paga para que arranquemos tu proyecto."
+                  : "Confirm and pay so we can start your project."}
+              </p>
+            </div>
+            <Button onClick={payNow} size="lg" disabled={paying} className="w-full sm:w-auto">
+              {paying ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <CreditCard className="h-4 w-4" />
+              )}
+              {es
+                ? `Confirmar proyecto · ${formatCentsMXN(order.amount_total)}`
+                : `Confirm project · ${formatCentsMXN(order.amount_total)}`}
+            </Button>
           </div>
-          <Button onClick={payNow} size="lg" disabled={paying}>
-            {paying ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <CreditCard className="h-4 w-4" />
-            )}
-            {es ? "Pagar ahora" : "Pay now"}
-          </Button>
+          <p className="mt-4 flex items-center gap-2 text-xs text-fg-dim">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            {es
+              ? "Pago seguro con Stripe. El trabajo comienza una vez confirmado el pago."
+              : "Secure payment with Stripe. Work begins once payment is confirmed."}
+          </p>
         </div>
       )}
 
@@ -202,25 +221,31 @@ export function OrderDetail({
             </div>
           )}
 
-          {milestones.length > 0 ? (
-            <div className="rounded-3xl border border-line bg-ink-3 p-6">
-              <MilestoneTimeline milestones={milestones} />
-            </div>
+          {isPaid ? (
+            <>
+              {milestones.length > 0 && (
+                <div className="rounded-3xl border border-line bg-ink-3 p-6">
+                  <MilestoneTimeline milestones={milestones} />
+                </div>
+              )}
+              <div className="rounded-3xl border border-line bg-ink-3 p-6">
+                <DeliverablesPanel orderId={orderId} />
+              </div>
+            </>
           ) : (
-            <div className="rounded-3xl border border-dashed border-line bg-ink-3/50 p-8 text-center text-sm text-fg-dim">
-              {order.status === "pending_quote"
-                ? es
-                  ? "En cuanto revisemos tu solicitud te enviaremos la cotización aquí."
-                  : "As soon as we review your request we'll send the quote here."
-                : es
-                  ? "El progreso aparecerá aquí cuando arranque tu proyecto."
-                  : "Progress will appear here once your project starts."}
+            <div className="flex flex-col items-center rounded-3xl border border-dashed border-line bg-ink-3/50 p-8 text-center">
+              <Clock className="h-6 w-6 text-fg-faint" />
+              <p className="mt-3 text-sm text-fg-dim">
+                {order.status === "pending_quote"
+                  ? es
+                    ? "Estamos preparando tu cotización. Te avisaremos aquí y por tu panel en cuanto esté lista."
+                    : "We're preparing your quote. We'll let you know here and in your dashboard as soon as it's ready."
+                  : es
+                    ? "El progreso y los entregables se desbloquean en cuanto confirmes el pago arriba."
+                    : "Progress and deliverables unlock as soon as you confirm the payment above."}
+              </p>
             </div>
           )}
-
-          <div className="rounded-3xl border border-line bg-ink-3 p-6">
-            <DeliverablesPanel orderId={orderId} />
-          </div>
         </div>
 
         <div className="rounded-3xl border border-line bg-ink-3 p-6">

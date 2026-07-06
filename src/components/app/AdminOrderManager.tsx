@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Loader2, Plus, Check } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, Check, Clock } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import {
   STATUS_META,
@@ -124,6 +124,10 @@ export function AdminOrderManager({
       <p className="py-24 text-center text-fg-dim">Pedido no encontrado.</p>
     );
 
+  const isPaid = (
+    ["paid", "in_progress", "review", "delivered"] as OrderStatus[]
+  ).includes(order.status);
+
   return (
     <div>
       <Link
@@ -194,76 +198,101 @@ export function AdminOrderManager({
             </div>
           )}
 
-          {/* Estado */}
-          <div className="rounded-3xl border border-line bg-ink-3 p-6">
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-fg-faint">
-              Cambiar estado
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {NEXT_STATUSES.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setStatus(s)}
-                  disabled={order.status === s}
-                  className={cn(
-                    "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
-                    order.status === s
-                      ? "border-orange bg-orange text-white"
-                      : "border-line text-fg-muted hover:text-fg",
-                  )}
-                >
-                  {STATUS_META[s].es}
-                </button>
-              ))}
+          {/* Esperando pago del cliente (cotizado pero sin pagar) */}
+          {order.status === "quoted" && (
+            <div className="flex items-start gap-3 rounded-3xl border border-warning/30 bg-warning/10 p-6">
+              <Clock className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
+              <div>
+                <p className="font-semibold text-fg">
+                  Esperando el pago del cliente
+                </p>
+                <p className="mt-1 text-sm text-fg-muted">
+                  Cotizado en {formatCentsMXN(order.amount_total)}. Las
+                  herramientas de trabajo (estado, hitos y entregables) se
+                  activan automáticamente cuando el cliente confirme el pago.
+                </p>
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Hitos */}
-          <div className="rounded-3xl border border-line bg-ink-3 p-6">
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-fg-faint">
-              Hitos de progreso
-            </h3>
-            <ul className="space-y-2">
-              {milestones.map((m) => (
-                <li
-                  key={m.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-line bg-ink-2 p-3"
-                >
-                  <span className="truncate text-sm">{m.title}</span>
-                  <select
-                    value={m.status}
-                    onChange={(e) =>
-                      setMilestoneStatus(m.id, e.target.value as MilestoneStatus)
-                    }
-                    className="rounded-lg border border-line bg-ink px-2 py-1 text-xs outline-none focus:border-orange"
+          {/* Herramientas de trabajo — solo tras el pago */}
+          {isPaid && (
+            <>
+              {/* Estado */}
+              <div className="rounded-3xl border border-line bg-ink-3 p-6">
+                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-fg-faint">
+                  Cambiar estado
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {NEXT_STATUSES.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setStatus(s)}
+                      disabled={order.status === s}
+                      className={cn(
+                        "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
+                        order.status === s
+                          ? "border-orange bg-orange text-white"
+                          : "border-line text-fg-muted hover:text-fg",
+                      )}
+                    >
+                      {STATUS_META[s].es}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Hitos */}
+              <div className="rounded-3xl border border-line bg-ink-3 p-6">
+                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-fg-faint">
+                  Hitos de progreso
+                </h3>
+                <ul className="space-y-2">
+                  {milestones.map((m) => (
+                    <li
+                      key={m.id}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-line bg-ink-2 p-3"
+                    >
+                      <span className="truncate text-sm">{m.title}</span>
+                      <select
+                        value={m.status}
+                        onChange={(e) =>
+                          setMilestoneStatus(
+                            m.id,
+                            e.target.value as MilestoneStatus,
+                          )
+                        }
+                        className="rounded-lg border border-line bg-ink px-2 py-1 text-xs outline-none focus:border-orange"
+                      >
+                        <option value="pending">Pendiente</option>
+                        <option value="active">Activo</option>
+                        <option value="done">Hecho</option>
+                      </select>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-3 flex items-center gap-2">
+                  <input
+                    value={newMilestone}
+                    onChange={(e) => setNewMilestone(e.target.value)}
+                    placeholder="Nuevo hito…"
+                    className="flex-1 rounded-xl border border-line bg-ink-2 px-3 py-2 text-sm outline-none focus:border-orange"
+                  />
+                  <button
+                    onClick={addMilestone}
+                    className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange text-white transition-colors hover:bg-orange-mid"
+                    aria-label="Agregar hito"
                   >
-                    <option value="pending">Pendiente</option>
-                    <option value="active">Activo</option>
-                    <option value="done">Hecho</option>
-                  </select>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-3 flex items-center gap-2">
-              <input
-                value={newMilestone}
-                onChange={(e) => setNewMilestone(e.target.value)}
-                placeholder="Nuevo hito…"
-                className="flex-1 rounded-xl border border-line bg-ink-2 px-3 py-2 text-sm outline-none focus:border-orange"
-              />
-              <button
-                onClick={addMilestone}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange text-white transition-colors hover:bg-orange-mid"
-                aria-label="Agregar hito"
-              >
-                <Plus className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
 
-          <div className="rounded-3xl border border-line bg-ink-3 p-6">
-            <DeliverablesPanel orderId={orderId} canUpload />
-          </div>
+              <div className="rounded-3xl border border-line bg-ink-3 p-6">
+                <DeliverablesPanel orderId={orderId} canUpload />
+              </div>
+            </>
+          )}
         </div>
 
         <div className="rounded-3xl border border-line bg-ink-3 p-6">
