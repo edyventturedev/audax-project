@@ -1,0 +1,20 @@
+VIDEOS DEL HERO (fondo rotativo del inicio)
+============================================
+
+Pon aquí tus videos de fondo con EXACTAMENTE estos nombres:
+
+  cafe.mp4         -> fondo del rubro "Cafetería"
+  hotel.mp4        -> fondo del rubro "Hotel"
+  restaurante.mp4  -> fondo del rubro "Restaurante"
+
+Recomendaciones:
+- Formato .mp4 (H.264), horizontal (16:9).
+- Sin audio (el fondo va en silencio) y en bucle (loops) corto: 8-15 seg.
+- Peso ligero: idealmente < 5 MB cada uno para que cargue rápido.
+- Resolución 1920x1080 es suficiente.
+
+Mientras no existan los archivos, se muestra una imagen de relleno (póster).
+En cuanto los subas con estos nombres, el hero los usa automáticamente.
+
+¿Quieres cambiar los rubros (ej. "Barbería", "Gimnasio") o agregar más?
+Se edita en: src/components/landing/Hero.tsx (arreglo THEMES).
