@@ -8,30 +8,16 @@ import { Button } from "@/components/ui/Button";
 
 /**
  * Cada tema = un rubro con su VIDEO de fondo + un SITIO DEMO de ese rubro.
- * Para poner tus videos: guárdalos en /public/hero/ (cafe.mp4, hotel.mp4,
- * restaurante.mp4) y ya se usan solos. Mientras tanto se ve el póster.
+ * Videos: guárdalos en /public/hero/ (cafe.mp4, hotel.mp4, restaurante.mp4).
+ * Sitios demo: imágenes de diseño completas en /public/hero/demo-*.
  */
 type Theme = {
   id: string;
   label: string;
   video: string; // /public/hero/xxx.mp4
-  poster: string; // imagen de respaldo mientras cargas el video
+  poster: string; // imagen de respaldo mientras carga el video
   overlay: string; // degradado sobre el video (legibilidad)
-  demo: DemoConfig;
-};
-
-type DemoConfig = {
-  brand: string;
-  url: string;
-  nav: string[];
-  cta: string;
-  title: string;
-  tagline: string;
-  image: string;
-  accent: string;
-  pageBg: string;
-  pageInk: string;
-  serif?: boolean;
+  demo: { url: string; image: string };
 };
 
 const THEMES: Theme[] = [
@@ -42,19 +28,7 @@ const THEMES: Theme[] = [
     poster: "https://picsum.photos/seed/audaxcafe/1600/900",
     overlay:
       "linear-gradient(180deg, rgba(20,12,6,0.55) 0%, rgba(20,12,6,0.35) 40%, rgba(10,10,10,0.9) 100%)",
-    demo: {
-      brand: "Café Aurora",
-      url: "cafeaurora.mx",
-      nav: ["Menú", "Nosotros", "Visítanos"],
-      cta: "Reservar",
-      title: "Tu café de\ntodos los días",
-      tagline: "Grano de especialidad, tostado en casa.",
-      image: "https://picsum.photos/seed/cafehero/1000/620",
-      accent: "#b06a3b",
-      pageBg: "#f6efe6",
-      pageInk: "#2b1d14",
-      serif: false,
-    },
+    demo: { url: "cafeaurora.mx", image: "/hero/demo-cafe.png" },
   },
   {
     id: "hotel",
@@ -63,19 +37,7 @@ const THEMES: Theme[] = [
     poster: "https://picsum.photos/seed/audaxhotel/1600/900",
     overlay:
       "linear-gradient(180deg, rgba(6,20,26,0.55) 0%, rgba(6,20,26,0.35) 40%, rgba(10,10,10,0.9) 100%)",
-    demo: {
-      brand: "Hotel Marena",
-      url: "hotelmarena.mx",
-      nav: ["Habitaciones", "Servicios", "Ubicación"],
-      cta: "Reservar estancia",
-      title: "Descanso\nfrente al mar",
-      tagline: "Una experiencia de lujo en cada detalle.",
-      image: "https://picsum.photos/seed/hotelhero/1000/620",
-      accent: "#0e7c86",
-      pageBg: "#f1f6f6",
-      pageInk: "#0b2530",
-      serif: true,
-    },
+    demo: { url: "hotelmarena.mx", image: "/hero/demo-hotel.jpg" },
   },
   {
     id: "restaurante",
@@ -84,19 +46,7 @@ const THEMES: Theme[] = [
     poster: "https://picsum.photos/seed/audaxresto/1600/900",
     overlay:
       "linear-gradient(180deg, rgba(26,10,8,0.55) 0%, rgba(26,10,8,0.35) 40%, rgba(10,10,10,0.9) 100%)",
-    demo: {
-      brand: "Sazón",
-      url: "sazon.mx",
-      nav: ["Carta", "Reservas", "Eventos"],
-      cta: "Reservar mesa",
-      title: "Sabores que\nse recuerdan",
-      tagline: "Cocina de autor con producto local.",
-      image: "https://picsum.photos/seed/restohero/1000/620",
-      accent: "#c0392b",
-      pageBg: "#f7efe9",
-      pageInk: "#2a1512",
-      serif: true,
-    },
+    demo: { url: "harry.mx", image: "/hero/demo-restaurante.jpg" },
   },
 ];
 
@@ -224,7 +174,7 @@ export function Hero() {
           </div>
 
           {/* Sitio demo del rubro */}
-          <div className="mx-auto mt-6 w-full max-w-[680px]">
+          <div className="mx-auto mt-6 w-full max-w-[720px]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={theme.id}
@@ -233,7 +183,7 @@ export function Hero() {
                 exit={{ opacity: 0, y: -16, scale: 0.98 }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               >
-                <DemoSite demo={theme.demo} />
+                <DemoSite url={theme.demo.url} image={theme.demo.image} />
               </motion.div>
             </AnimatePresence>
             <p className="mt-4 text-center text-xs text-white/50">
@@ -246,8 +196,8 @@ export function Hero() {
   );
 }
 
-/** Mockup de un mini-sitio dentro de un marco de navegador. */
-function DemoSite({ demo }: { demo: DemoConfig }) {
+/** Marco de navegador que enmarca el diseño completo del sitio demo. */
+function DemoSite({ url, image }: { url: string; image: string }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-white/15 bg-white shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]">
       {/* Barra del navegador */}
@@ -256,60 +206,19 @@ function DemoSite({ demo }: { demo: DemoConfig }) {
         <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
         <span className="ml-2 flex-1 truncate rounded-md bg-black/10 px-2.5 py-1 text-[11px] text-black/50">
-          {demo.url}
+          {url}
         </span>
       </div>
-
-      {/* El "sitio" */}
-      <div style={{ background: demo.pageBg, color: demo.pageInk }}>
-        {/* Nav del sitio demo */}
-        <div className="flex items-center justify-between px-4 py-3 sm:px-5">
-          <span
-            className="text-sm font-bold sm:text-base"
-            style={{ fontFamily: demo.serif ? "Georgia, serif" : "inherit" }}
-          >
-            {demo.brand}
-          </span>
-          <div className="hidden items-center gap-4 text-xs sm:flex">
-            {demo.nav.map((n) => (
-              <span key={n} style={{ opacity: 0.7 }}>
-                {n}
-              </span>
-            ))}
-          </div>
-          <span
-            className="rounded-full px-3 py-1.5 text-[11px] font-semibold text-white"
-            style={{ background: demo.accent }}
-          >
-            {demo.cta}
-          </span>
-        </div>
-
-        {/* Hero del sitio demo */}
-        <div className="relative">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={demo.image}
-            alt={`Sitio web demo de ${demo.brand}`}
-            width={1000}
-            height={620}
-            className="aspect-[5/3] w-full object-cover"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6">
-            <h3
-              className="whitespace-pre-line text-2xl font-extrabold leading-none text-white sm:text-3xl"
-              style={{ fontFamily: demo.serif ? "Georgia, serif" : "inherit" }}
-            >
-              {demo.title}
-            </h3>
-            <p className="mt-2 text-xs text-white/85 sm:text-sm">
-              {demo.tagline}
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Diseño completo del sitio (tu imagen) */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={image}
+        alt={`Sitio web demo: ${url}`}
+        width={1600}
+        height={1000}
+        className="aspect-[16/10] w-full object-cover"
+        loading="lazy"
+      />
     </div>
   );
 }
