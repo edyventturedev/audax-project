@@ -28,7 +28,7 @@ const THEMES: Theme[] = [
     poster: "https://picsum.photos/seed/audaxcafe/1600/900",
     overlay:
       "linear-gradient(180deg, rgba(20,12,6,0.55) 0%, rgba(20,12,6,0.35) 40%, rgba(10,10,10,0.9) 100%)",
-    demo: { url: "cafeaurora.mx", image: "/hero/demo-cafe.png" },
+    demo: { url: "cafeaurora.mx", image: "/hero/demo-cafe.jpg" },
   },
   {
     id: "hotel",
@@ -83,7 +83,6 @@ export function Hero() {
               muted
               loop
               playsInline
-              poster={theme.poster}
               className="h-full w-full object-cover"
             >
               <source src={theme.video} type="video/mp4" />
