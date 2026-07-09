@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { MobileTabBar } from "@/components/site/MobileTabBar";
+import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 
 export default function MarketingLayout({
   children,
@@ -17,6 +18,7 @@ export default function MarketingLayout({
       {/* Espacio para que la barra inferior móvil no tape el contenido */}
       <div aria-hidden className="h-24 lg:hidden" />
       <MobileTabBar />
+      <WhatsAppButton />
     </>
   );
 }
