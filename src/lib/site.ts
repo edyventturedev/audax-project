@@ -23,6 +23,12 @@ export const SOCIAL = {
   instagram: "https://instagram.com/audaxproject",
 };
 
+// Enlace para agendar videollamada. Se pega la URL de la "Agenda de citas" de
+// Google Calendar, que genera un enlace de Google Meet automáticamente y
+// muestra la reunión en tu Google Calendar. Se define en Vercel como
+// NEXT_PUBLIC_MEETING_URL. Si está vacío, el botón cae a un correo.
+export const MEETING_URL = process.env.NEXT_PUBLIC_MEETING_URL?.trim() || "";
+
 // País de operación. Se atiende a todo México de forma remota.
 export const COUNTRY = { name: "México", code: "MX" };
 
