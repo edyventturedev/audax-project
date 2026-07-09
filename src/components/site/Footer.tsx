@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Mail, AtSign, MapPin } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageProvider";
 import { categories } from "@/data/services";
+import { navSections } from "@/data/nav";
 import { Logo } from "./Logo";
 
 export function Footer() {
@@ -12,7 +13,7 @@ export function Footer() {
 
   return (
     <footer className="mt-24 border-t border-line bg-ink">
-      <div className="mx-auto grid max-w-[1100px] gap-10 px-6 py-14 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-[1100px] gap-10 px-6 py-14 sm:grid-cols-2 lg:grid-cols-5">
         <div className="sm:col-span-2 lg:col-span-1">
           <Logo />
           <p className="mt-4 max-w-xs text-sm text-fg-dim">{t.footer.tagline}</p>
@@ -36,6 +37,26 @@ export function Footer() {
                 </Link>
               </li>
             ))}
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-fg-faint">
+            {navSections.find((s) => s.id === "recursos")?.label[lang]}
+          </h3>
+          <ul className="mt-4 space-y-2.5">
+            {navSections
+              .find((s) => s.id === "recursos")
+              ?.items.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="text-sm text-fg-muted transition-colors hover:text-fg"
+                  >
+                    {item.label[lang]}
+                  </Link>
+                </li>
+              ))}
           </ul>
         </div>
 
