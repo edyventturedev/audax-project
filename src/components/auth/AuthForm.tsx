@@ -186,7 +186,9 @@ export function AuthForm({ mode }: { mode: Mode }) {
       <p className="mt-6 text-center text-sm text-fg-dim">
         {isSignup ? a.hasAccount : a.noAccount}{" "}
         <Link
-          href={isSignup ? "/login" : "/signup"}
+          href={`${isSignup ? "/login" : "/signup"}${
+            next && next !== "/dashboard" ? `?next=${encodeURIComponent(next)}` : ""
+          }`}
           className="font-medium text-orange hover:underline"
         >
           {isSignup ? a.loginLink : a.signupLink}

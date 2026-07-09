@@ -1,8 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Loader2, Lock, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  AlertCircle,
+  ShieldCheck,
+  RefreshCcw,
+  CheckCircle2,
+  Lock,
+  type LucideIcon,
+} from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageProvider";
 import { useSupabaseUser } from "@/lib/supabase/useUser";
 import { type Service, formatMXN } from "@/data/services";
@@ -72,9 +80,39 @@ const QUESTIONS: ChipQuestion[] = [
   },
 ];
 
+type TrustItem = { icon: LucideIcon; es: string; en: string };
+
+const TRUST_FIXED: TrustItem[] = [
+  { icon: ShieldCheck, es: "Pago 100% seguro con Stripe", en: "100% secure payment with Stripe" },
+  { icon: RefreshCcw, es: "Incluye revisiones", en: "Revisions included" },
+  { icon: CheckCircle2, es: "Sigue el avance en tu panel", en: "Track progress in your dashboard" },
+];
+
+const TRUST_QUOTE: TrustItem[] = [
+  { icon: CheckCircle2, es: "Sin compromiso: primero cotizamos", en: "No commitment: we quote first" },
+  { icon: ShieldCheck, es: "No avanzamos hasta que apruebes", en: "We don't start until you approve" },
+  { icon: Lock, es: "Pago seguro con Stripe", en: "Secure payment with Stripe" },
+];
+
 function labelFor(q: ChipQuestion, value: string, lang: Lang): string {
   const opt = q.options.find((o) => o.value === value);
   return opt ? opt[lang] : value;
+}
+
+function TrustList({ items, lang }: { items: TrustItem[]; lang: Lang }) {
+  return (
+    <ul className="mt-4 space-y-2 border-t border-line pt-4">
+      {items.map((it, i) => {
+        const Icon = it.icon;
+        return (
+          <li key={i} className="flex items-center gap-2.5 text-xs text-fg-dim">
+            <Icon className="h-4 w-4 shrink-0 text-orange" />
+            {it[lang]}
+          </li>
+        );
+      })}
+    </ul>
+  );
 }
 
 export function RequestPanel({ service }: { service: Service }) {
@@ -93,8 +131,45 @@ export function RequestPanel({ service }: { service: Service }) {
   const [businessType, setBusinessType] = useState("");
   const [references, setReferences] = useState("");
   const [details, setDetails] = useState("");
+  const [pendingSubmit, setPendingSubmit] = useState(false);
+  const autoSubmitted = useRef(false);
 
   const isFixed = service.pricingType === "fixed";
+  const stashKey = `audax:quote:${service.slug}`;
+
+  // Restaura respuestas guardadas antes de registrarse (si volvió con sesión).
+  useEffect(() => {
+    if (isFixed) return;
+    try {
+      const raw = localStorage.getItem(stashKey);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      if (d.ts && Date.now() - d.ts > 86_400_000) {
+        localStorage.removeItem(stashKey);
+        return;
+      }
+      setAnswers(d.answers ?? {});
+      setBusinessType(d.businessType ?? "");
+      setReferences(d.references ?? "");
+      setDetails(d.details ?? "");
+      setShowBrief(true);
+      setPendingSubmit(true);
+    } catch {
+      /* ignore */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Cuando ya hay sesión y había una solicitud pendiente, la envía sola.
+  useEffect(() => {
+    if (pendingSubmit && user && !authLoading && !autoSubmitted.current) {
+      autoSubmitted.current = true;
+      localStorage.removeItem(stashKey);
+      setPendingSubmit(false);
+      handleQuote();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingSubmit, user, authLoading]);
 
   function toggle(q: ChipQuestion, value: string) {
     setAnswers((prev) => {
@@ -137,7 +212,25 @@ export function RequestPanel({ service }: { service: Service }) {
     businessType.trim().length > 0 ||
     details.trim().length > 0;
 
+  function goSignup() {
+    router.push(`/signup?next=${encodeURIComponent(pathname)}`);
+  }
+
+  // Guarda las respuestas y manda a registrarse; al volver se envían solas.
+  function stashAndSignup() {
+    try {
+      localStorage.setItem(
+        stashKey,
+        JSON.stringify({ answers, businessType, references, details, ts: Date.now() }),
+      );
+    } catch {
+      /* ignore */
+    }
+    goSignup();
+  }
+
   async function handleFixed() {
+    if (!user) return goSignup();
     setError(null);
     setLoading(true);
     try {
@@ -156,6 +249,7 @@ export function RequestPanel({ service }: { service: Service }) {
   }
 
   async function handleQuote() {
+    if (!user) return stashAndSignup();
     setError(null);
     setLoading(true);
     try {
@@ -172,6 +266,8 @@ export function RequestPanel({ service }: { service: Service }) {
       setLoading(false);
     }
   }
+
+  const busy = loading || authLoading;
 
   return (
     <div className="rounded-3xl border border-line bg-ink-3 p-6">
@@ -193,34 +289,26 @@ export function RequestPanel({ service }: { service: Service }) {
       )}
 
       <div className="mt-6">
-        {authLoading ? (
-          <div className="flex h-13 items-center justify-center">
-            <Loader2 className="h-5 w-5 animate-spin text-fg-dim" />
-          </div>
-        ) : !user ? (
+        {isFixed ? (
           <>
             <Button
-              href={`/login?next=${encodeURIComponent(pathname)}`}
+              onClick={handleFixed}
               size="lg"
               className="w-full"
+              disabled={busy}
             >
-              <Lock className="h-4 w-4" />
-              {es ? "Inicia sesión para continuar" : "Log in to continue"}
+              {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+              {es ? "Solicitar y pagar" : "Request & pay"}
             </Button>
-            <p className="mt-3 text-center text-xs text-fg-faint">
-              {es ? "Crea tu cuenta gratis en segundos." : "Create your free account in seconds."}
-            </p>
+            {!user && !authLoading && (
+              <p className="mt-3 text-center text-xs text-fg-faint">
+                {es
+                  ? "Crea tu cuenta gratis en segundos para pagar de forma segura."
+                  : "Create your free account in seconds to pay securely."}
+              </p>
+            )}
+            <TrustList items={TRUST_FIXED} lang={lang} />
           </>
-        ) : isFixed ? (
-          <Button
-            onClick={handleFixed}
-            size="lg"
-            className="w-full"
-            disabled={loading}
-          >
-            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {es ? "Solicitar y pagar" : "Request & pay"}
-          </Button>
         ) : showBrief ? (
           <div className="space-y-5">
             <p className="text-sm text-fg-dim">
@@ -332,27 +420,40 @@ export function RequestPanel({ service }: { service: Service }) {
               onClick={handleQuote}
               size="lg"
               className="w-full"
-              disabled={loading || !canSend}
+              disabled={busy || !canSend}
             >
-              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {busy && <Loader2 className="h-4 w-4 animate-spin" />}
               {es ? "Enviar solicitud" : "Send request"}
             </Button>
-            {!canSend && (
+            {!canSend ? (
               <p className="text-center text-xs text-fg-faint">
                 {es
                   ? "Elige un objetivo o cuéntanos qué necesitas para continuar."
                   : "Pick a goal or tell us what you need to continue."}
               </p>
+            ) : (
+              !user &&
+              !authLoading && (
+                <p className="text-center text-xs text-fg-faint">
+                  {es
+                    ? "Al enviar crearás tu cuenta gratis (20 s) para dar seguimiento. No pierdes lo que escribiste."
+                    : "On send you'll create your free account (20 s) to follow up. You won't lose your answers."}
+                </p>
+              )
             )}
+            <TrustList items={TRUST_QUOTE} lang={lang} />
           </div>
         ) : (
-          <Button
-            onClick={() => setShowBrief(true)}
-            size="lg"
-            className="w-full"
-          >
-            {es ? "Solicitar cotización" : "Request a quote"}
-          </Button>
+          <>
+            <Button
+              onClick={() => setShowBrief(true)}
+              size="lg"
+              className="w-full"
+            >
+              {es ? "Solicitar cotización" : "Request a quote"}
+            </Button>
+            <TrustList items={TRUST_QUOTE} lang={lang} />
+          </>
         )}
 
         {error && (
