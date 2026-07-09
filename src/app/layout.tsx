@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Syne, Inter } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/i18n/LanguageProvider";
+import { Analytics } from "@/components/analytics/Analytics";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { organizationSchema, websiteSchema } from "@/lib/schema";
 import {
@@ -90,6 +91,7 @@ export default function RootLayout({
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema()} />
         <LanguageProvider>{children}</LanguageProvider>
+        <Analytics />
       </body>
     </html>
   );

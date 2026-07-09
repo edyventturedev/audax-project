@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { notifyAdminNewQuote, confirmQuoteToClient } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -47,6 +48,25 @@ export async function POST(request: NextRequest) {
       { error: "No se pudo crear la solicitud." },
       { status: 500 },
     );
+  }
+
+  // Notificaciones por correo (no bloquean la respuesta si fallan).
+  try {
+    await notifyAdminNewQuote({
+      serviceName: service.name_es,
+      brief: brief ?? "",
+      clientEmail: user.email ?? undefined,
+      orderId: order.id,
+    });
+    if (user.email) {
+      await confirmQuoteToClient({
+        to: user.email,
+        serviceName: service.name_es,
+        orderId: order.id,
+      });
+    }
+  } catch (err) {
+    console.error("[quote] error enviando correos:", err);
   }
 
   return NextResponse.json({ orderId: order.id });

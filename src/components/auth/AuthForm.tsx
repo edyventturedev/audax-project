@@ -181,6 +181,23 @@ export function AuthForm({ mode }: { mode: Mode }) {
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
           {isSignup ? a.signup : a.login}
         </Button>
+
+        {isSignup && (
+          <p className="text-center text-xs leading-relaxed text-fg-faint">
+            Al crear tu cuenta aceptas nuestros{" "}
+            <Link href="/terminos" className="text-fg-dim underline hover:text-fg">
+              Términos
+            </Link>{" "}
+            y el{" "}
+            <Link
+              href="/aviso-de-privacidad"
+              className="text-fg-dim underline hover:text-fg"
+            >
+              Aviso de Privacidad
+            </Link>
+            .
+          </p>
+        )}
       </form>
 
       <p className="mt-6 text-center text-sm text-fg-dim">

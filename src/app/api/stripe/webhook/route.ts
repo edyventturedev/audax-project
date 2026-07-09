@@ -6,6 +6,7 @@ import {
   STRIPE_WEBHOOK_SECRET,
 } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { notifyAdminPayment, confirmPaymentToClient } from "@/lib/email";
 
 // Hitos por defecto que se crean cuando un pedido queda pagado.
 const DEFAULT_MILESTONES = [
@@ -63,6 +64,40 @@ export async function POST(request: NextRequest) {
           await supabase.from("order_milestones").insert(
             DEFAULT_MILESTONES.map((m) => ({ ...m, order_id: orderId })),
           );
+        }
+
+        // Avisos por correo (no deben tumbar el webhook si fallan).
+        try {
+          const { data: order } = await supabase
+            .from("orders")
+            .select("service_name")
+            .eq("id", orderId)
+            .single();
+          const serviceName = order?.service_name ?? "tu servicio";
+          const clientEmail = session.customer_details?.email ?? undefined;
+          const amountLabel =
+            typeof session.amount_total === "number"
+              ? new Intl.NumberFormat("es-MX", {
+                  style: "currency",
+                  currency: (session.currency ?? "mxn").toUpperCase(),
+                  maximumFractionDigits: 0,
+                }).format(session.amount_total / 100)
+              : undefined;
+          await notifyAdminPayment({
+            serviceName,
+            clientEmail,
+            amountLabel,
+            orderId,
+          });
+          if (clientEmail) {
+            await confirmPaymentToClient({
+              to: clientEmail,
+              serviceName,
+              orderId,
+            });
+          }
+        } catch (err) {
+          console.error("[webhook] error enviando correos:", err);
         }
       }
       break;

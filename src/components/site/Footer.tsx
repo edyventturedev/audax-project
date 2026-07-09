@@ -111,13 +111,18 @@ export function Footer() {
       </div>
 
       <div className="border-t border-line">
-        <div className="mx-auto flex max-w-[1100px] flex-col items-center justify-between gap-2 px-6 py-6 text-xs text-fg-faint sm:flex-row">
+        <div className="mx-auto flex max-w-[1100px] flex-col items-center justify-between gap-3 px-6 py-6 text-xs text-fg-faint sm:flex-row">
           <span>
             © {year} Audax Project. {t.footer.rights}
           </span>
-          <span className="font-[family-name:var(--font-display)]">
-            Diseño que impacta.
-          </span>
+          <nav className="flex items-center gap-4">
+            <Link href="/aviso-de-privacidad" className="hover:text-fg">
+              {lang === "es" ? "Aviso de Privacidad" : "Privacy Notice"}
+            </Link>
+            <Link href="/terminos" className="hover:text-fg">
+              {lang === "es" ? "Términos" : "Terms"}
+            </Link>
+          </nav>
         </div>
       </div>
     </footer>
