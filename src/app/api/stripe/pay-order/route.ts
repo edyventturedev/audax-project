@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
+import { welcomeDiscountFor } from "@/lib/promo";
 import { SITE_URL } from "@/lib/supabase/env";
 
 // Paga un pedido existente que ya fue cotizado (status 'quoted' + amount_total).
@@ -45,6 +46,7 @@ export async function POST(request: NextRequest) {
   }
 
   const stripe = getStripe();
+  const discounts = await welcomeDiscountFor(supabase, stripe, user.id);
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     customer_email: user.email ?? undefined,
@@ -58,6 +60,7 @@ export async function POST(request: NextRequest) {
         },
       },
     ],
+    ...(discounts ? { discounts } : {}),
     metadata: { order_id: order.id, user_id: user.id },
     success_url: `${SITE_URL}/dashboard/orders/${order.id}?paid=1`,
     cancel_url: `${SITE_URL}/dashboard/orders/${order.id}?canceled=1`,

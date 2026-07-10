@@ -9,11 +9,13 @@ import {
   RefreshCcw,
   CheckCircle2,
   Lock,
+  Gift,
   type LucideIcon,
 } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageProvider";
 import { useSupabaseUser } from "@/lib/supabase/useUser";
 import { type Service, formatMXN } from "@/data/services";
+import { WELCOME_DISCOUNT_PERCENT } from "@/lib/promo";
 import { Button } from "@/components/ui/Button";
 
 type Lang = "es" | "en";
@@ -287,6 +289,14 @@ export function RequestPanel({ service }: { service: Service }) {
           {es ? "hasta" : "up to"} {formatMXN(service.priceMax)}
         </p>
       )}
+
+      {/* Descuento de bienvenida (primera compra) */}
+      <div className="mt-4 flex items-center gap-2 rounded-xl border border-orange/25 bg-orange-soft px-3 py-2 text-xs font-medium text-orange">
+        <Gift className="h-4 w-4 shrink-0" />
+        {es
+          ? `−${WELCOME_DISCOUNT_PERCENT}% en tu primer proyecto, se aplica al pagar`
+          : `−${WELCOME_DISCOUNT_PERCENT}% on your first project, applied at checkout`}
+      </div>
 
       <div className="mt-6">
         {isFixed ? (
