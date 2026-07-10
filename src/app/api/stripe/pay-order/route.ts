@@ -1,7 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
-import { welcomeDiscountFor } from "@/lib/promo";
+import {
+  isFirstPurchase,
+  ensureWelcomeCoupon,
+  ensureCreatorCoupon,
+  validatePromoCode,
+} from "@/lib/promo";
 import { SITE_URL } from "@/lib/supabase/env";
 
 // Paga un pedido existente que ya fue cotizado (status 'quoted' + amount_total).
@@ -21,8 +27,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No autenticado." }, { status: 401 });
   }
 
-  const { orderId } = (await request.json().catch(() => ({}))) as {
+  const { orderId, promoCode } = (await request.json().catch(() => ({}))) as {
     orderId?: string;
+    promoCode?: string;
   };
   if (!orderId) {
     return NextResponse.json({ error: "Falta orderId." }, { status: 400 });
@@ -46,7 +53,26 @@ export async function POST(request: NextRequest) {
   }
 
   const stripe = getStripe();
-  const discounts = await welcomeDiscountFor(supabase, stripe, user.id);
+
+  // Descuento: 15% de bienvenida en la 1ª compra; a partir de la 2ª, código
+  // promocional (no acumulables). Se decide del lado del servidor.
+  let discounts: { coupon: string }[] | undefined;
+  let appliedPromo: string | null = null;
+  try {
+    if (await isFirstPurchase(supabase, user.id)) {
+      discounts = [{ coupon: await ensureWelcomeCoupon(stripe) }];
+    } else if (promoCode) {
+      const admin = createAdminClient();
+      const v = await validatePromoCode(admin, promoCode);
+      if (v.valid) {
+        discounts = [{ coupon: await ensureCreatorCoupon(stripe, v.percent) }];
+        appliedPromo = v.code;
+      }
+    }
+  } catch (err) {
+    console.error("[promo] pay-order:", err);
+  }
+
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     customer_email: user.email ?? undefined,
@@ -61,14 +87,21 @@ export async function POST(request: NextRequest) {
       },
     ],
     ...(discounts ? { discounts } : {}),
-    metadata: { order_id: order.id, user_id: user.id },
+    metadata: {
+      order_id: order.id,
+      user_id: user.id,
+      ...(appliedPromo ? { promo_code: appliedPromo } : {}),
+    },
     success_url: `${SITE_URL}/dashboard/orders/${order.id}?paid=1`,
     cancel_url: `${SITE_URL}/dashboard/orders/${order.id}?canceled=1`,
   });
 
   await supabase
     .from("orders")
-    .update({ stripe_checkout_session_id: session.id })
+    .update({
+      stripe_checkout_session_id: session.id,
+      ...(appliedPromo ? { promo_code: appliedPromo } : {}),
+    })
     .eq("id", order.id);
 
   return NextResponse.json({ url: session.url });

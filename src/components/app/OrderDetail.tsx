@@ -24,6 +24,7 @@ import { StatusBadge } from "./StatusBadge";
 import { MilestoneTimeline } from "./MilestoneTimeline";
 import { OrderMessages } from "./OrderMessages";
 import { DeliverablesPanel } from "./DeliverablesPanel";
+import { PromoCodeField } from "@/components/service/PromoCodeField";
 import { Button } from "@/components/ui/Button";
 
 export function OrderDetail({
@@ -43,6 +44,7 @@ export function OrderDetail({
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [paying, setPaying] = useState(false);
+  const [promoCode, setPromoCode] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -100,7 +102,7 @@ export function OrderDetail({
     const res = await fetch("/api/stripe/pay-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ orderId }),
+      body: JSON.stringify({ orderId, promoCode }),
     });
     const data = await res.json();
     if (res.ok && data.url) window.location.href = data.url;
@@ -198,6 +200,7 @@ export function OrderDetail({
                 : `Confirm project · ${formatCentsMXN(order.amount_total)}`}
             </Button>
           </div>
+          <PromoCodeField onChange={setPromoCode} />
           <p className="mt-4 flex items-center gap-2 text-xs text-fg-dim">
             <ShieldCheck className="h-3.5 w-3.5" />
             {es

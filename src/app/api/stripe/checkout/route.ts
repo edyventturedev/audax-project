@@ -1,7 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
-import { welcomeDiscountFor } from "@/lib/promo";
+import {
+  isFirstPurchase,
+  ensureWelcomeCoupon,
+  ensureCreatorCoupon,
+  validatePromoCode,
+} from "@/lib/promo";
 import { SITE_URL } from "@/lib/supabase/env";
 
 export async function POST(request: NextRequest) {
@@ -20,8 +26,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No autenticado." }, { status: 401 });
   }
 
-  const { serviceSlug } = (await request.json().catch(() => ({}))) as {
+  const { serviceSlug, promoCode } = (await request.json().catch(() => ({}))) as {
     serviceSlug?: string;
+    promoCode?: string;
   };
   if (!serviceSlug) {
     return NextResponse.json({ error: "Falta serviceSlug." }, { status: 400 });
@@ -69,9 +76,27 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // 2) Crear la sesión de Stripe Checkout (con 15% si es primera compra).
+  // 2) Descuento: 15% de bienvenida en la 1ª compra; a partir de la 2ª, código
+  //    promocional de creador (no acumulables). Se decide en el servidor.
   const stripe = getStripe();
-  const discounts = await welcomeDiscountFor(supabase, stripe, user.id);
+  let discounts: { coupon: string }[] | undefined;
+  let appliedPromo: string | null = null;
+  try {
+    if (await isFirstPurchase(supabase, user.id)) {
+      discounts = [{ coupon: await ensureWelcomeCoupon(stripe) }];
+    } else if (promoCode) {
+      const admin = createAdminClient();
+      const v = await validatePromoCode(admin, promoCode);
+      if (v.valid) {
+        discounts = [{ coupon: await ensureCreatorCoupon(stripe, v.percent) }];
+        appliedPromo = v.code;
+      }
+    }
+  } catch (err) {
+    console.error("[promo] checkout:", err);
+  }
+
+  // 3) Crear la sesión de Stripe Checkout.
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     customer_email: user.email ?? undefined,
@@ -86,15 +111,22 @@ export async function POST(request: NextRequest) {
       },
     ],
     ...(discounts ? { discounts } : {}),
-    metadata: { order_id: order.id, user_id: user.id },
+    metadata: {
+      order_id: order.id,
+      user_id: user.id,
+      ...(appliedPromo ? { promo_code: appliedPromo } : {}),
+    },
     success_url: `${SITE_URL}/dashboard/orders/${order.id}?paid=1`,
     cancel_url: `${SITE_URL}/servicios/detalle/${service.slug}?canceled=1`,
   });
 
-  // 3) Guardar el id de sesión en el pedido.
+  // 4) Guardar el id de sesión (y código) en el pedido.
   await supabase
     .from("orders")
-    .update({ stripe_checkout_session_id: session.id })
+    .update({
+      stripe_checkout_session_id: session.id,
+      ...(appliedPromo ? { promo_code: appliedPromo } : {}),
+    })
     .eq("id", order.id);
 
   return NextResponse.json({ url: session.url });

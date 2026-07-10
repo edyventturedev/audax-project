@@ -25,13 +25,15 @@ export async function isFirstPurchase(
   return (count ?? 0) === 0;
 }
 
-/**
- * Recupera (o crea una sola vez) el cupón reutilizable de 15% de bienvenida
- * en Stripe. Devuelve su id para usarlo en `discounts` del Checkout.
- */
-export async function ensureWelcomeCoupon(stripe: Stripe): Promise<string> {
+/** Recupera (o crea una sola vez) un cupón reutilizable en Stripe por id/%. */
+async function ensureCoupon(
+  stripe: Stripe,
+  id: string,
+  percent: number,
+  name: string,
+): Promise<string> {
   try {
-    const existing = await stripe.coupons.retrieve(COUPON_ID);
+    const existing = await stripe.coupons.retrieve(id);
     if (existing && !("deleted" in existing && existing.deleted)) {
       return existing.id;
     }
@@ -39,13 +41,68 @@ export async function ensureWelcomeCoupon(stripe: Stripe): Promise<string> {
     /* no existe todavía: se crea abajo */
   }
   const coupon = await stripe.coupons.create({
-    id: COUPON_ID,
-    percent_off: WELCOME_DISCOUNT_PERCENT,
+    id,
+    percent_off: percent,
     duration: "once",
-    name: "Bienvenida −15% (primera compra)",
-    metadata: { audax: "welcome_first_purchase" },
+    name,
   });
   return coupon.id;
+}
+
+/** Cupón de 15% de bienvenida (primera compra). */
+export async function ensureWelcomeCoupon(stripe: Stripe): Promise<string> {
+  return ensureCoupon(
+    stripe,
+    COUPON_ID,
+    WELCOME_DISCOUNT_PERCENT,
+    "Bienvenida −15% (primera compra)",
+  );
+}
+
+/** Cupón para un código de creador con un porcentaje dado. */
+export async function ensureCreatorCoupon(
+  stripe: Stripe,
+  percent: number,
+): Promise<string> {
+  return ensureCoupon(
+    stripe,
+    `PROMO${percent}`,
+    percent,
+    `Código promocional −${percent}%`,
+  );
+}
+
+export type PromoResult =
+  | { valid: true; code: string; percent: number }
+  | { valid: false; reason: string };
+
+/**
+ * Valida un código de descuento contra la tabla `promo_codes`. Debe llamarse
+ * con un cliente con permisos de lectura sobre la tabla (service role).
+ */
+export async function validatePromoCode(
+  supabase: SupabaseClient,
+  rawCode: string,
+): Promise<PromoResult> {
+  const code = (rawCode ?? "").toUpperCase().replace(/\s/g, "");
+  if (!code) return { valid: false, reason: "Ingresa un código." };
+
+  const { data, error } = await supabase
+    .from("promo_codes")
+    .select("code, percent_off, active, max_redemptions, times_redeemed")
+    .eq("code", code)
+    .maybeSingle();
+
+  if (error || !data) return { valid: false, reason: "Código no válido." };
+  if (!data.active)
+    return { valid: false, reason: "Este código ya no está disponible." };
+  if (
+    data.max_redemptions != null &&
+    data.times_redeemed >= data.max_redemptions
+  ) {
+    return { valid: false, reason: "Este código llegó a su límite de usos." };
+  }
+  return { valid: true, code: data.code, percent: data.percent_off };
 }
 
 /**

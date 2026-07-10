@@ -59,7 +59,39 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="6. Plazos">
+      <Section title="6. Descuentos y códigos promocionales">
+        <p>
+          Ofrecemos un <strong>15% de descuento de bienvenida</strong> aplicable
+          únicamente a la <strong>primera compra</strong> de cada cliente; se
+          aplica de forma automática al pagar y no requiere código.
+        </p>
+        <p>
+          Adicionalmente podemos emitir <strong>códigos promocionales</strong>{" "}
+          (por ejemplo, en campañas con creadores de contenido) que otorgan un
+          descuento sobre la cotización al momento de pagar. Estos códigos:
+        </p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>
+            Aplican <strong>a partir de la segunda compra</strong>; no son
+            válidos en la primera compra, ya que esta cuenta con el descuento de
+            bienvenida.
+          </li>
+          <li>
+            <strong>No son acumulables</strong> con el descuento de bienvenida ni
+            con otras promociones. Se aplica un solo descuento por pedido.
+          </li>
+          <li>
+            Pueden tener vigencia, límite de usos o quedar desactivados en
+            cualquier momento a criterio de {SITE_NAME}.
+          </li>
+          <li>
+            No tienen valor en efectivo, no son transferibles y no aplican de
+            forma retroactiva a pedidos ya pagados.
+          </li>
+        </ul>
+      </Section>
+
+      <Section title="7. Plazos">
         <p>
           Los tiempos de entrega son estimados y dependen de que el cliente
           proporcione a tiempo la información, textos y materiales necesarios.
@@ -68,7 +100,7 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="7. Cancelaciones y reembolsos">
+      <Section title="8. Cancelaciones y reembolsos">
         <p>
           Si cancelas un proyecto ya iniciado, se te cobrará por el trabajo
           realizado hasta ese momento. Los montos correspondientes a trabajo ya
@@ -77,7 +109,7 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="8. Propiedad intelectual">
+      <Section title="9. Propiedad intelectual">
         <p>
           Una vez cubierto el pago total, los derechos de los entregables
           finales se transfieren al cliente. {SITE_NAME} se reserva el derecho de
@@ -86,7 +118,7 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="9. Limitación de responsabilidad">
+      <Section title="10. Limitación de responsabilidad">
         <p>
           {SITE_NAME} no será responsable por daños indirectos o pérdidas
           derivadas del uso de los entregables una vez entregados, ni por
@@ -95,7 +127,7 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="10. Legislación aplicable">
+      <Section title="11. Legislación aplicable">
         <p>
           Estos términos se rigen por las leyes de los Estados Unidos Mexicanos.
           Para cualquier controversia, las partes se someten a la jurisdicción
@@ -104,7 +136,7 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="11. Contacto">
+      <Section title="12. Contacto">
         <p>
           Para cualquier duda sobre estos términos, escríbenos a{" "}
           <a href={`mailto:${CONTACT_EMAIL}`} className="text-orange hover:underline">

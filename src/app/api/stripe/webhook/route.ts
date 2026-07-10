@@ -66,6 +66,16 @@ export async function POST(request: NextRequest) {
           );
         }
 
+        // Contar el canje del código promocional (solo pagos completados).
+        const promoCode = session.metadata?.promo_code;
+        if (promoCode) {
+          try {
+            await supabase.rpc("redeem_promo_code", { p_code: promoCode });
+          } catch (err) {
+            console.error("[webhook] error registrando canje de código:", err);
+          }
+        }
+
         // Avisos por correo (no deben tumbar el webhook si fallan).
         try {
           const { data: order } = await supabase

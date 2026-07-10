@@ -18,7 +18,7 @@ export function AdminHeader() {
             <ShieldCheck className="h-3.5 w-3.5" />
             Admin
           </span>
-          <nav className="hidden sm:block">
+          <nav className="hidden items-center gap-1 sm:flex">
             <Link
               href="/admin"
               className={cn(
@@ -29,6 +29,17 @@ export function AdminHeader() {
               )}
             >
               Pedidos
+            </Link>
+            <Link
+              href="/admin/codigos"
+              className={cn(
+                "rounded-full px-3 py-1.5 text-sm transition-colors",
+                pathname === "/admin/codigos"
+                  ? "bg-glass text-fg"
+                  : "text-fg-muted hover:text-fg",
+              )}
+            >
+              Códigos
             </Link>
           </nav>
         </div>

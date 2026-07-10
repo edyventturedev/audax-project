@@ -16,6 +16,7 @@ import { useLanguage } from "@/i18n/LanguageProvider";
 import { useSupabaseUser } from "@/lib/supabase/useUser";
 import { type Service, formatMXN } from "@/data/services";
 import { WELCOME_DISCOUNT_PERCENT } from "@/lib/promo";
+import { PromoCodeField } from "./PromoCodeField";
 import { Button } from "@/components/ui/Button";
 
 type Lang = "es" | "en";
@@ -134,6 +135,7 @@ export function RequestPanel({ service }: { service: Service }) {
   const [references, setReferences] = useState("");
   const [details, setDetails] = useState("");
   const [pendingSubmit, setPendingSubmit] = useState(false);
+  const [promoCode, setPromoCode] = useState<string | null>(null);
   const autoSubmitted = useRef(false);
 
   const isFixed = service.pricingType === "fixed";
@@ -239,7 +241,7 @@ export function RequestPanel({ service }: { service: Service }) {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ serviceSlug: service.slug }),
+        body: JSON.stringify({ serviceSlug: service.slug, promoCode }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Error");
@@ -317,6 +319,7 @@ export function RequestPanel({ service }: { service: Service }) {
                   : "Create your free account in seconds to pay securely."}
               </p>
             )}
+            {user && <PromoCodeField onChange={setPromoCode} />}
             <TrustList items={TRUST_FIXED} lang={lang} />
           </>
         ) : showBrief ? (
