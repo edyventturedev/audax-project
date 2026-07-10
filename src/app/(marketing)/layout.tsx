@@ -1,3 +1,4 @@
+import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { MobileTabBar } from "@/components/site/MobileTabBar";
@@ -10,6 +11,7 @@ export default function MarketingLayout({
 }) {
   return (
     <>
+      <AnnouncementBar />
       <Navbar />
       <main id="main" className="min-h-dvh">
         {children}

@@ -56,7 +56,7 @@ export function Navbar() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <header className="fixed inset-x-0 top-4 z-[1000] flex justify-center px-4">
+      <header className="fixed inset-x-0 top-[calc(1rem+var(--promo-h,0px))] z-[1000] flex justify-center px-4 transition-[top] duration-300">
         {/* Backdrop del menú móvil */}
         <AnimatePresence>
           {menuOpen && (
