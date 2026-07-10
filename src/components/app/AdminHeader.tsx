@@ -52,6 +52,17 @@ export function AdminHeader() {
             >
               Blog
             </Link>
+            <Link
+              href="/admin/foro"
+              className={cn(
+                "rounded-full px-3 py-1.5 text-sm transition-colors",
+                pathname.startsWith("/admin/foro")
+                  ? "bg-glass text-fg"
+                  : "text-fg-muted hover:text-fg",
+              )}
+            >
+              Reportes
+            </Link>
           </nav>
         </div>
         <UserMenu />

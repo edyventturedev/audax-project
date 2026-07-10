@@ -2,10 +2,15 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { categories, services } from "@/data/services";
 import { getPublishedPosts } from "@/lib/blog";
+import { getRecentThreads } from "@/lib/forum";
+import { FORUM_CATEGORIES } from "@/data/forum";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const blogPosts = await getPublishedPosts();
+  const [blogPosts, threads] = await Promise.all([
+    getPublishedPosts(),
+    getRecentThreads(500),
+  ]);
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, lastModified: now, changeFrequency: "weekly", priority: 1 },
@@ -42,5 +47,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...categoryPages, ...servicePages, ...blogPages];
+  const forumCategoryPages: MetadataRoute.Sitemap = FORUM_CATEGORIES.map((c) => ({
+    url: `${SITE_URL}/foro/${c.slug}`,
+    lastModified: now,
+    changeFrequency: "daily",
+    priority: 0.5,
+  }));
+
+  const forumThreadPages: MetadataRoute.Sitemap = threads.map((t) => ({
+    url: `${SITE_URL}/foro/hilo/${t.id}`,
+    lastModified: new Date(t.last_activity_at),
+    changeFrequency: "weekly",
+    priority: 0.4,
+  }));
+
+  return [
+    ...staticPages,
+    ...categoryPages,
+    ...servicePages,
+    ...blogPages,
+    ...forumCategoryPages,
+    ...forumThreadPages,
+  ];
 }
