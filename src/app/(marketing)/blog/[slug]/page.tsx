@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Clock } from "lucide-react";
-import { blogPosts, getPost } from "@/data/blog";
+import { getPublishedPost } from "@/lib/blog";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema } from "@/lib/schema";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
+import { Markdown } from "@/components/blog/Markdown";
+import { AdSlot } from "@/components/blog/AdSlot";
 import { Button } from "@/components/ui/Button";
-
-export function generateStaticParams() {
-  return blogPosts.map((p) => ({ slug: p.slug }));
-}
 
 export async function generateMetadata({
   params,
@@ -18,7 +17,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPost(slug);
+  const post = await getPublishedPost(slug);
   if (!post) return { title: "Artículo no encontrado" };
   return {
     title: post.title,
@@ -29,7 +28,8 @@ export async function generateMetadata({
       description: post.excerpt,
       url: `/blog/${post.slug}`,
       type: "article",
-      publishedTime: post.date,
+      publishedTime: post.published_at ?? undefined,
+      images: post.cover_image ? [post.cover_image] : undefined,
     },
   };
 }
@@ -40,17 +40,19 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = getPost(slug);
+  const post = await getPublishedPost(slug);
   if (!post) return notFound();
 
+  const dateIso = post.published_at ?? new Date().toISOString();
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
     description: post.excerpt,
-    datePublished: post.date,
-    dateModified: post.date,
+    datePublished: dateIso,
+    dateModified: dateIso,
     url: `${SITE_URL}/blog/${post.slug}`,
+    ...(post.cover_image ? { image: post.cover_image } : {}),
     author: { "@type": "Organization", name: SITE_NAME },
     publisher: { "@type": "Organization", name: SITE_NAME },
   };
@@ -80,50 +82,45 @@ export default async function BlogPostPage({
         </span>
         <span className="inline-flex items-center gap-1">
           <Clock className="h-3.5 w-3.5" />
-          {post.readMin} min
+          {post.read_min} min
         </span>
-        <span>
-          {new Date(post.date).toLocaleDateString("es-MX", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })}
-        </span>
+        {post.published_at && (
+          <span>
+            {new Date(post.published_at).toLocaleDateString("es-MX", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </span>
+        )}
       </div>
 
       <h1 className="mt-4 font-[family-name:var(--font-display)] text-3xl font-extrabold leading-tight tracking-tight text-balance sm:text-4xl">
         {post.title}
       </h1>
 
-      <div className="mt-8 flex flex-col gap-5 leading-relaxed text-fg-muted">
-        {post.body.map((block, i) => {
-          if (block.h)
-            return (
-              <h2
-                key={i}
-                className="mt-2 font-[family-name:var(--font-display)] text-xl font-bold text-fg"
-              >
-                {block.h}
-              </h2>
-            );
-          if (block.list)
-            return (
-              <ul key={i} className="flex flex-col gap-2 pl-1">
-                {block.list.map((li, j) => (
-                  <li key={j} className="flex gap-2.5">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-orange" />
-                    <span>{li}</span>
-                  </li>
-                ))}
-              </ul>
-            );
-          return (
-            <p key={i} className="text-[1.02rem]">
-              {block.p}
-            </p>
-          );
-        })}
+      {post.cover_image && (
+        <div className="mt-8 overflow-hidden rounded-3xl border border-line">
+          <Image
+            src={post.cover_image}
+            alt={post.title}
+            width={1280}
+            height={720}
+            className="h-auto w-full object-cover"
+            unoptimized
+          />
+        </div>
+      )}
+
+      {/* Anuncio superior */}
+      <AdSlot />
+
+      <div className="mt-4">
+        <Markdown content={post.body} />
       </div>
+
+      {/* Anuncio al final del artículo */}
+      <AdSlot />
 
       <div className="mt-12 rounded-3xl border border-line bg-ink-3 p-8 text-center">
         <h3 className="font-[family-name:var(--font-display)] text-xl font-bold">
