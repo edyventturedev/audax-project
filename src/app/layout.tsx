@@ -3,6 +3,7 @@ import { Syne, Inter } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/i18n/LanguageProvider";
 import { Analytics } from "@/components/analytics/Analytics";
+import { CookieConsent } from "@/components/site/CookieConsent";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { organizationSchema, websiteSchema } from "@/lib/schema";
 import {
@@ -90,7 +91,10 @@ export default function RootLayout({
         </a>
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema()} />
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          {children}
+          <CookieConsent />
+        </LanguageProvider>
         <Analytics />
       </body>
     </html>
