@@ -39,6 +39,13 @@ export function BlogEditor({ id }: { id?: string }) {
   const [status, setStatus] = useState<Status>("draft");
   const [publishedAt, setPublishedAt] = useState("");
 
+  // Contenido en inglés + idioma que se está editando.
+  const [contentLang, setContentLang] = useState<"es" | "en">("es");
+  const [titleEn, setTitleEn] = useState("");
+  const [excerptEn, setExcerptEn] = useState("");
+  const [bodyEn, setBodyEn] = useState("");
+  const [tagEn, setTagEn] = useState("");
+
   useEffect(() => {
     if (isNew) return;
     (async () => {
@@ -55,6 +62,10 @@ export function BlogEditor({ id }: { id?: string }) {
         setExcerpt(data.excerpt ?? "");
         setCoverImage(data.cover_image ?? "");
         setBody(data.body ?? "");
+        setTitleEn(data.title_en ?? "");
+        setExcerptEn(data.excerpt_en ?? "");
+        setBodyEn(data.body_en ?? "");
+        setTagEn(data.tag_en ?? "");
         setStatus(data.status);
         setPublishedAt(isoToLocalInput(data.published_at));
       }
@@ -89,6 +100,10 @@ export function BlogEditor({ id }: { id?: string }) {
       excerpt: excerpt.trim(),
       cover_image: coverImage.trim() || null,
       body,
+      title_en: titleEn.trim() || null,
+      excerpt_en: excerptEn.trim() || null,
+      body_en: bodyEn.trim() || null,
+      tag_en: tagEn.trim() || null,
       read_min: estimateReadMin(body),
       status,
       published_at: published,
@@ -158,34 +173,84 @@ export function BlogEditor({ id }: { id?: string }) {
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
         {/* Columna principal */}
         <div className="space-y-4">
-          <Field label="Título">
+          {/* Selector de idioma del contenido */}
+          <div className="inline-flex rounded-full border border-line bg-ink-2 p-1">
+            {(["es", "en"] as const).map((lng) => (
+              <button
+                key={lng}
+                type="button"
+                onClick={() => setContentLang(lng)}
+                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                  contentLang === lng
+                    ? "bg-orange text-white"
+                    : "text-fg-muted hover:text-fg"
+                }`}
+              >
+                {lng === "es" ? "Español" : "English"}
+              </button>
+            ))}
+          </div>
+          {contentLang === "en" && (
+            <p className="text-xs text-fg-dim">
+              Contenido en inglés (opcional). Si lo dejas vacío, se muestra el
+              español a los usuarios en inglés.
+            </p>
+          )}
+
+          <Field label={contentLang === "es" ? "Título" : "Title (EN)"}>
             <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Título del artículo"
+              value={contentLang === "es" ? title : titleEn}
+              onChange={(e) =>
+                contentLang === "es"
+                  ? setTitle(e.target.value)
+                  : setTitleEn(e.target.value)
+              }
+              placeholder={contentLang === "es" ? "Título del artículo" : "Article title"}
               className="w-full rounded-xl border border-line bg-ink-2 px-3 py-2.5 text-sm outline-none focus:border-orange"
             />
           </Field>
 
-          <Field label="Extracto (resumen para tarjetas y SEO)">
+          <Field
+            label={
+              contentLang === "es"
+                ? "Extracto (resumen para tarjetas y SEO)"
+                : "Excerpt (EN)"
+            }
+          >
             <textarea
-              value={excerpt}
-              onChange={(e) => setExcerpt(e.target.value)}
+              value={contentLang === "es" ? excerpt : excerptEn}
+              onChange={(e) =>
+                contentLang === "es"
+                  ? setExcerpt(e.target.value)
+                  : setExcerptEn(e.target.value)
+              }
               rows={2}
-              placeholder="Una o dos frases que resuman el artículo."
+              placeholder={
+                contentLang === "es"
+                  ? "Una o dos frases que resuman el artículo."
+                  : "One or two sentences summarizing the article."
+              }
               className="w-full resize-none rounded-xl border border-line bg-ink-2 px-3 py-2.5 text-sm outline-none focus:border-orange"
             />
           </Field>
 
-          <Field label="Contenido (Markdown: ## título, - lista, **negrita**, [texto](url))">
+          <Field
+            label={`${
+              contentLang === "es" ? "Contenido" : "Content (EN)"
+            } (Markdown: ## título, - lista, **negrita**, [texto](url))`}
+          >
             {preview ? (
               <div className="min-h-[300px] rounded-xl border border-line bg-ink-3 p-5">
-                <Markdown content={body} />
+                <Markdown content={contentLang === "es" ? body : bodyEn} />
               </div>
             ) : (
               <textarea
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
+                value={contentLang === "es" ? body : bodyEn}
+                onChange={(e) =>
+                  contentLang === "es"
+                    ? setBody(e.target.value)
+                    : setBodyEn(e.target.value)
+                }
                 rows={20}
                 placeholder={"Escribe aquí…\n\n## Un subtítulo\n\nUn párrafo.\n\n- Punto uno\n- Punto dos"}
                 className="w-full rounded-xl border border-line bg-ink-2 p-3 font-mono text-sm leading-relaxed outline-none focus:border-orange"
@@ -249,6 +314,15 @@ export function BlogEditor({ id }: { id?: string }) {
               value={tag}
               onChange={(e) => setTag(e.target.value)}
               placeholder="Desarrollo web"
+              className="w-full rounded-xl border border-line bg-ink-2 px-3 py-2.5 text-sm outline-none focus:border-orange"
+            />
+          </Field>
+
+          <Field label="Etiqueta (EN, opcional)">
+            <input
+              value={tagEn}
+              onChange={(e) => setTagEn(e.target.value)}
+              placeholder="Web development"
               className="w-full rounded-xl border border-line bg-ink-2 px-3 py-2.5 text-sm outline-none focus:border-orange"
             />
           </Field>

@@ -16,3 +16,32 @@ export function estimateReadMin(body: string): number {
   const words = body.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
 }
+
+type BilingualPost = {
+  title: string;
+  title_en?: string | null;
+  excerpt: string;
+  excerpt_en?: string | null;
+  body?: string;
+  body_en?: string | null;
+  tag: string;
+  tag_en?: string | null;
+};
+
+export type LocalizedBlog = {
+  title: string;
+  excerpt: string;
+  body: string;
+  tag: string;
+};
+
+/** Devuelve los campos del post en el idioma pedido (con respaldo al español). */
+export function localizeBlog(p: BilingualPost, lang: "es" | "en"): LocalizedBlog {
+  const en = lang === "en";
+  return {
+    title: (en && p.title_en) || p.title,
+    excerpt: (en && p.excerpt_en) || p.excerpt || "",
+    body: (en && p.body_en) || p.body || "",
+    tag: (en && p.tag_en) || p.tag,
+  };
+}
