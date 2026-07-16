@@ -6,6 +6,7 @@ import {
   STRIPE_WEBHOOK_SECRET,
 } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { grantPackAccess } from "@/lib/lutPackGrant";
 import { notifyAdminPayment, confirmPaymentToClient } from "@/lib/email";
 
 // Hitos por defecto que se crean cuando un pedido queda pagado.
@@ -50,6 +51,14 @@ export async function POST(request: NextRequest) {
           .from("lut_downloads")
           .update({ status: "granted" })
           .eq("id", lutDownloadId);
+        break;
+      }
+
+      // Compra de un PAQUETE de LUTs: desbloquear todos sus LUTs.
+      const packId = session.metadata?.pack_id;
+      const packUserId = session.metadata?.user_id;
+      if (session.metadata?.lut_pack_purchase_id && packId && packUserId) {
+        await grantPackAccess(supabase, packId, packUserId);
         break;
       }
 

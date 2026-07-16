@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getPublishedLuts } from "@/lib/luts";
+import { getPublishedLuts, getPublishedPacks } from "@/lib/luts";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbSchema } from "@/lib/schema";
 import { LutsCatalogView } from "@/components/luts/LutsCatalogView";
@@ -19,7 +19,10 @@ export const metadata: Metadata = {
 };
 
 export default async function LutsPage() {
-  const luts = await getPublishedLuts();
+  const [luts, packs] = await Promise.all([
+    getPublishedLuts(),
+    getPublishedPacks(),
+  ]);
   return (
     <>
       <JsonLd
@@ -28,7 +31,7 @@ export default async function LutsPage() {
           { name: "LUTs", path: "/luts" },
         ])}
       />
-      <LutsCatalogView luts={luts} />
+      <LutsCatalogView luts={luts} packs={packs} />
     </>
   );
 }
