@@ -13,6 +13,7 @@ import {
   Film,
   MessagesSquare,
   Newspaper,
+  Aperture,
   type LucideIcon,
 } from "lucide-react";
 
@@ -31,6 +32,7 @@ const MAP: Record<string, LucideIcon> = {
   Film,
   MessagesSquare,
   Newspaper,
+  Aperture,
 };
 
 /** Renderiza un ícono de lucide por su nombre (usado por la navegación). */

@@ -103,6 +103,12 @@ export const navSections: NavSection[] = [
         label: { es: "Edición de video", en: "Video editing" },
         desc: { es: "Video profesional", en: "Professional video" },
       },
+      {
+        href: "/luts",
+        icon: "Aperture",
+        label: { es: "LUTs de color", en: "Color LUTs" },
+        desc: { es: "Presets para foto y video", en: "Presets for photo & video" },
+      },
     ],
   },
   {

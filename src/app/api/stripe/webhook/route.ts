@@ -42,6 +42,17 @@ export async function POST(request: NextRequest) {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
+
+      // Compra de un LUT: otorgar acceso de descarga.
+      const lutDownloadId = session.metadata?.lut_download_id;
+      if (lutDownloadId) {
+        await supabase
+          .from("lut_downloads")
+          .update({ status: "granted" })
+          .eq("id", lutDownloadId);
+        break;
+      }
+
       const orderId = session.metadata?.order_id;
       if (orderId) {
         await supabase
