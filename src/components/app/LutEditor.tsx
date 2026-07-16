@@ -360,31 +360,58 @@ export function LutEditor({ id }: { id?: string }) {
           </label>
 
           <div className="border-t border-line pt-4">
-            <label className="flex items-center gap-2.5 text-sm text-fg-muted">
-              <input
-                type="checkbox"
-                checked={free}
-                onChange={(e) => setFree(e.target.checked)}
-                className="h-4 w-4 accent-orange"
-              />
-              LUT gratis
-            </label>
-            {!free && (
-              <Field label="Precio (MXN)">
-                <input
-                  type="number"
-                  min={1}
-                  value={pricePesos}
-                  onChange={(e) => setPricePesos(e.target.value)}
-                  placeholder="199"
-                  className="w-full rounded-xl border border-line bg-ink-2 px-3 py-2.5 text-sm outline-none focus:border-orange"
-                />
-                {pricePesos && Number(pricePesos) > 0 && (
-                  <p className="mt-1.5 text-xs text-fg-faint">
-                    Se cobra {formatCentsMXN(Math.round(Number(pricePesos) * 100))}.
-                  </p>
-                )}
-              </Field>
+            <label className="mb-1.5 block text-xs font-medium text-fg-dim">Precio</label>
+            <div className="grid grid-cols-2 gap-1 rounded-xl border border-line bg-ink-2 p-1">
+              <button
+                type="button"
+                onClick={() => setFree(true)}
+                className={`rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+                  free ? "bg-success text-white" : "text-fg-muted hover:text-fg"
+                }`}
+              >
+                Gratis
+              </button>
+              <button
+                type="button"
+                onClick={() => setFree(false)}
+                className={`rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+                  !free ? "bg-orange text-white" : "text-fg-muted hover:text-fg"
+                }`}
+              >
+                De pago
+              </button>
+            </div>
+
+            {free ? (
+              <p className="mt-2 text-xs text-fg-faint">
+                Cualquiera podrá descargarlo gratis (tras iniciar sesión).
+              </p>
+            ) : (
+              <div className="mt-3">
+                <div className="relative">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-fg-faint">
+                    $
+                  </span>
+                  <input
+                    type="number"
+                    min={1}
+                    inputMode="numeric"
+                    value={pricePesos}
+                    onChange={(e) => setPricePesos(e.target.value)}
+                    placeholder="199"
+                    autoFocus
+                    className="w-full rounded-xl border border-line bg-ink-2 py-2.5 pl-7 pr-14 text-sm outline-none focus:border-orange"
+                  />
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-fg-faint">
+                    MXN
+                  </span>
+                </div>
+                <p className="mt-1.5 text-xs text-fg-faint">
+                  {pricePesos && Number(pricePesos) > 0
+                    ? `Se cobra ${formatCentsMXN(Math.round(Number(pricePesos) * 100))} al comprar.`
+                    : "Escribe el precio en pesos (ej. 199)."}
+                </p>
+              </div>
             )}
           </div>
 
