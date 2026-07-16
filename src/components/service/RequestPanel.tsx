@@ -275,21 +275,41 @@ export function RequestPanel({ service }: { service: Service }) {
 
   return (
     <div className="rounded-3xl border border-line bg-ink-3 p-6">
-      <span className="text-xs uppercase tracking-wide text-fg-faint">
-        {isFixed ? (es ? "Precio" : "Price") : t.services.from}
-      </span>
-      <div className="mt-1 flex items-baseline gap-1">
-        <span className="font-[family-name:var(--font-display)] text-4xl font-extrabold tabular-nums">
-          {formatMXN(service.priceMin)}
-        </span>
-        {service.unit && (
-          <span className="text-sm text-fg-dim">{service.unit[lang]}</span>
-        )}
-      </div>
-      {!isFixed && (
-        <p className="mt-1 text-sm text-fg-dim">
-          {es ? "hasta" : "up to"} {formatMXN(service.priceMax)}
-        </p>
+      {service.hidePrice ? (
+        <>
+          <span className="text-xs uppercase tracking-wide text-fg-faint">
+            {es ? "Inversión" : "Investment"}
+          </span>
+          <div className="mt-1">
+            <span className="font-[family-name:var(--font-display)] text-3xl font-extrabold">
+              {es ? "Cotización a medida" : "Custom quote"}
+            </span>
+          </div>
+          <p className="mt-1 text-sm text-fg-dim">
+            {es
+              ? "Cada proyecto es distinto. Cuéntanos qué necesitas y te damos un precio claro, sin compromiso."
+              : "Every project is different. Tell us what you need and we'll give you a clear price, no commitment."}
+          </p>
+        </>
+      ) : (
+        <>
+          <span className="text-xs uppercase tracking-wide text-fg-faint">
+            {isFixed ? (es ? "Precio" : "Price") : t.services.from}
+          </span>
+          <div className="mt-1 flex items-baseline gap-1">
+            <span className="font-[family-name:var(--font-display)] text-4xl font-extrabold tabular-nums">
+              {formatMXN(service.priceMin)}
+            </span>
+            {service.unit && (
+              <span className="text-sm text-fg-dim">{service.unit[lang]}</span>
+            )}
+          </div>
+          {!isFixed && (
+            <p className="mt-1 text-sm text-fg-dim">
+              {es ? "hasta" : "up to"} {formatMXN(service.priceMax)}
+            </p>
+          )}
+        </>
       )}
 
       {/* Descuento de bienvenida (primera compra) */}

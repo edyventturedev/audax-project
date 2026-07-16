@@ -41,17 +41,25 @@ export function ServiceCard({
 
         <div className="mt-6 flex items-end justify-between">
           <div>
-            <span className="block text-[11px] uppercase tracking-wide text-fg-faint">
-              {isFixed ? t.services.from : t.services.from}
-            </span>
-            <span className="font-[family-name:var(--font-display)] text-lg font-bold tabular-nums">
-              {formatMXN(service.priceMin)}
-              {service.unit && (
-                <span className="ml-1 text-xs font-normal text-fg-dim">
-                  {service.unit[lang]}
+            {service.hidePrice ? (
+              <span className="font-[family-name:var(--font-display)] text-base font-bold">
+                {lang === "es" ? "Cotización a medida" : "Custom quote"}
+              </span>
+            ) : (
+              <>
+                <span className="block text-[11px] uppercase tracking-wide text-fg-faint">
+                  {isFixed ? t.services.from : t.services.from}
                 </span>
-              )}
-            </span>
+                <span className="font-[family-name:var(--font-display)] text-lg font-bold tabular-nums">
+                  {formatMXN(service.priceMin)}
+                  {service.unit && (
+                    <span className="ml-1 text-xs font-normal text-fg-dim">
+                      {service.unit[lang]}
+                    </span>
+                  )}
+                </span>
+              </>
+            )}
           </div>
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-glass text-fg transition-colors group-hover:bg-orange group-hover:text-white">
             <ArrowUpRight className="h-4 w-4" />

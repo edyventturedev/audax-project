@@ -159,10 +159,18 @@ export function BusinessHighlights() {
                   <div className="relative z-10 mt-auto flex items-center justify-between pt-6">
                     {service && (
                       <span className="text-sm text-fg-dim">
-                        {es ? "Desde" : "From"}{" "}
-                        <span className="font-semibold text-fg">
-                          {formatMXN(service.priceMin)}
-                        </span>
+                        {service.hidePrice ? (
+                          <span className="font-semibold text-fg">
+                            {es ? "Cotización a medida" : "Custom quote"}
+                          </span>
+                        ) : (
+                          <>
+                            {es ? "Desde" : "From"}{" "}
+                            <span className="font-semibold text-fg">
+                              {formatMXN(service.priceMin)}
+                            </span>
+                          </>
+                        )}
                       </span>
                     )}
                     <span className="flex h-9 w-9 items-center justify-center rounded-full bg-glass text-fg transition-colors group-hover:bg-orange group-hover:text-white">

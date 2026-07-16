@@ -18,8 +18,9 @@ export async function generateMetadata({
   if (!service) return { title: "Servicio no encontrado" };
 
   const category = getCategory(service.category);
-  const priceLine =
-    service.pricingType === "fixed"
+  const priceLine = service.hidePrice
+    ? "Cotización a medida"
+    : service.pricingType === "fixed"
       ? `Desde ${formatMXN(service.priceMin)}`
       : `${formatMXN(service.priceMin)}–${formatMXN(service.priceMax)}`;
   const description = `${service.desc.es} ${priceLine}. Solicita, paga en línea y sigue tu proyecto con Audax Project, 100% en línea para todo México.`;

@@ -235,11 +235,19 @@ function ProductosSheet({
                         )}
                       </span>
                       <span className="mt-0.5 block text-xs text-fg-dim">
-                        {es ? "Desde" : "From"}{" "}
-                        <span className="tabular-nums text-fg-muted">
-                          {formatMXN(s.priceMin)}
-                        </span>
-                        {s.unit ? ` ${s.unit[lang]}` : ""}
+                        {s.hidePrice ? (
+                          <span className="text-fg-muted">
+                            {es ? "Cotización a medida" : "Custom quote"}
+                          </span>
+                        ) : (
+                          <>
+                            {es ? "Desde" : "From"}{" "}
+                            <span className="tabular-nums text-fg-muted">
+                              {formatMXN(s.priceMin)}
+                            </span>
+                            {s.unit ? ` ${s.unit[lang]}` : ""}
+                          </>
+                        )}
                       </span>
                     </span>
                     <ChevronRight className="h-4 w-4 shrink-0 text-fg-faint" />

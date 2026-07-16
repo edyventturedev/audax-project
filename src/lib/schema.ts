@@ -63,22 +63,29 @@ export function serviceSchema(service: Service, category?: Category) {
     offers: {
       "@type": "Offer",
       priceCurrency: "MXN",
-      price: service.priceMin,
-      ...(isFixed
+      // Los proyectos a medida no publican un precio concreto (solo cotización).
+      ...(service.hidePrice
         ? {}
         : {
-            priceSpecification: {
-              "@type": "PriceSpecification",
-              minPrice: service.priceMin,
-              maxPrice: service.priceMax,
-              priceCurrency: "MXN",
-            },
+            price: service.priceMin,
+            ...(isFixed
+              ? {}
+              : {
+                  priceSpecification: {
+                    "@type": "PriceSpecification",
+                    minPrice: service.priceMin,
+                    maxPrice: service.priceMax,
+                    priceCurrency: "MXN",
+                  },
+                }),
           }),
       availability: "https://schema.org/InStock",
       url: `${SITE_URL}/servicios/detalle/${service.slug}`,
-      description: isFixed
-        ? `Precio fijo: ${formatMXN(service.priceMin)}`
-        : `Desde ${formatMXN(service.priceMin)}`,
+      description: service.hidePrice
+        ? "Cotización a medida"
+        : isFixed
+          ? `Precio fijo: ${formatMXN(service.priceMin)}`
+          : `Desde ${formatMXN(service.priceMin)}`,
     },
   };
 }
